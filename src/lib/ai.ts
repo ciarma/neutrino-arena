@@ -19,11 +19,13 @@ function evaluate(state: GameState, ai: Faction): number {
   if (state.winner && state.winner !== ai) return -10000;
   const mine = piecesOf(state, ai).length;
   const theirs = piecesOf(state, otherFaction(ai)).length;
-  // Positional bonus: prefer advancing toward opponent's side.
+  // Positional bonus: advance toward the opponent side of the diamond.
+  // Diamond row = q + r; yellow pushes toward higher rows, purple toward 0.
+  const maxRow = (BOARD_SIZE - 1) * 2;
   let advance = 0;
-  const target = ai === "yellow" ? BOARD_SIZE - 1 : 0;
   for (const p of piecesOf(state, ai)) {
-    advance += (BOARD_SIZE - 1 - Math.abs(p.pos.r - target)) * 0.1;
+    const row = p.pos.q + p.pos.r;
+    advance += (ai === "yellow" ? row : maxRow - row) * 0.1;
   }
   return (mine - theirs) * 10 + advance;
 }
