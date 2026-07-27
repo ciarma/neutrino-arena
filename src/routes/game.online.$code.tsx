@@ -100,7 +100,7 @@ function OnlineGame() {
     setRow({ ...row, state: next });
     const { error } = await supabase
       .from("games")
-      .update({ state: next as unknown as Record<string, unknown>, updated_at: new Date().toISOString() })
+      .update({ state: next as never, updated_at: new Date().toISOString() })
       .eq("code", code);
     if (error) setError(error.message);
   };
@@ -110,7 +110,7 @@ function OnlineGame() {
     const fresh = initialState();
     setRow({ ...row, state: fresh });
     setSelected(null);
-    await supabase.from("games").update({ state: fresh as unknown as Record<string, unknown> }).eq("code", code);
+    await supabase.from("games").update({ state: fresh as never }).eq("code", code);
   };
 
   const shareCode = async () => {

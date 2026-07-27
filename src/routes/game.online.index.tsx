@@ -38,7 +38,7 @@ function OnlineLobby() {
     const code = randomCode();
     const { error } = await supabase.from("games").insert({
       code,
-      state: initialState() as unknown as Record<string, unknown>,
+      state: initialState() as never,
       yellow_player: playerId,
     });
     if (error) {

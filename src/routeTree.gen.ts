@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GameLocalRouteImport } from './routes/game.local'
 import { Route as GameAiRouteImport } from './routes/game.ai'
+import { Route as GameOnlineIndexRouteImport } from './routes/game.online.index'
+import { Route as GameOnlineCodeRouteImport } from './routes/game.online.$code'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +30,64 @@ const GameAiRoute = GameAiRouteImport.update({
   path: '/game/ai',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GameOnlineIndexRoute = GameOnlineIndexRouteImport.update({
+  id: '/game/online/',
+  path: '/game/online/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GameOnlineCodeRoute = GameOnlineCodeRouteImport.update({
+  id: '/game/online/$code',
+  path: '/game/online/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/game/ai': typeof GameAiRoute
   '/game/local': typeof GameLocalRoute
+  '/game/online/$code': typeof GameOnlineCodeRoute
+  '/game/online/': typeof GameOnlineIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/game/ai': typeof GameAiRoute
   '/game/local': typeof GameLocalRoute
+  '/game/online/$code': typeof GameOnlineCodeRoute
+  '/game/online': typeof GameOnlineIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/game/ai': typeof GameAiRoute
   '/game/local': typeof GameLocalRoute
+  '/game/online/$code': typeof GameOnlineCodeRoute
+  '/game/online/': typeof GameOnlineIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/game/ai' | '/game/local'
+  fullPaths:
+    | '/'
+    | '/game/ai'
+    | '/game/local'
+    | '/game/online/$code'
+    | '/game/online/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/game/ai' | '/game/local'
-  id: '__root__' | '/' | '/game/ai' | '/game/local'
+  to: '/' | '/game/ai' | '/game/local' | '/game/online/$code' | '/game/online'
+  id:
+    | '__root__'
+    | '/'
+    | '/game/ai'
+    | '/game/local'
+    | '/game/online/$code'
+    | '/game/online/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GameAiRoute: typeof GameAiRoute
   GameLocalRoute: typeof GameLocalRoute
+  GameOnlineCodeRoute: typeof GameOnlineCodeRoute
+  GameOnlineIndexRoute: typeof GameOnlineIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +113,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GameAiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/game/online/': {
+      id: '/game/online/'
+      path: '/game/online'
+      fullPath: '/game/online/'
+      preLoaderRoute: typeof GameOnlineIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/game/online/$code': {
+      id: '/game/online/$code'
+      path: '/game/online/$code'
+      fullPath: '/game/online/$code'
+      preLoaderRoute: typeof GameOnlineCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +134,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GameAiRoute: GameAiRoute,
   GameLocalRoute: GameLocalRoute,
+  GameOnlineCodeRoute: GameOnlineCodeRoute,
+  GameOnlineIndexRoute: GameOnlineIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
