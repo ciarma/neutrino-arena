@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GameLocalRouteImport } from './routes/game.local'
+import { Route as GameAiRouteImport } from './routes/game.ai'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GameLocalRoute = GameLocalRouteImport.update({
+  id: '/game/local',
+  path: '/game/local',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GameAiRoute = GameAiRouteImport.update({
+  id: '/game/ai',
+  path: '/game/ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/game/ai': typeof GameAiRoute
+  '/game/local': typeof GameLocalRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/game/ai': typeof GameAiRoute
+  '/game/local': typeof GameLocalRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/game/ai': typeof GameAiRoute
+  '/game/local': typeof GameLocalRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/game/ai' | '/game/local'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/game/ai' | '/game/local'
+  id: '__root__' | '/' | '/game/ai' | '/game/local'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GameAiRoute: typeof GameAiRoute
+  GameLocalRoute: typeof GameLocalRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/game/local': {
+      id: '/game/local'
+      path: '/game/local'
+      fullPath: '/game/local'
+      preLoaderRoute: typeof GameLocalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/game/ai': {
+      id: '/game/ai'
+      path: '/game/ai'
+      fullPath: '/game/ai'
+      preLoaderRoute: typeof GameAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GameAiRoute: GameAiRoute,
+  GameLocalRoute: GameLocalRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
