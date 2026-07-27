@@ -23,8 +23,8 @@ function LocalGame() {
   const [state, setState] = useState(initialState());
   const [selected, setSelected] = useState<Axial | null>(null);
 
-  const handleMove = (from: Axial, to: Axial) => {
-    const next = applyMove(state, from, to);
+  const handleMove = (from: Axial, to: Axial, chosen?: "M" | "T") => {
+    const next = applyMove(state, from, to, chosen);
     if (next) {
       setState(next);
       setSelected(null);

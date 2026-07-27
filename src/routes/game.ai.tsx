@@ -34,7 +34,7 @@ function AiGame() {
     const timeout = setTimeout(() => {
       const move = chooseAiMove(state, ai, 2);
       if (move) {
-        const next = applyMove(state, move.from, move.to);
+        const next = applyMove(state, move.from, move.to, move.chosen);
         if (next) setState(next);
       }
       setThinking(false);
@@ -42,9 +42,9 @@ function AiGame() {
     return () => clearTimeout(timeout);
   }, [state, ai]);
 
-  const handleMove = (from: Axial, to: Axial) => {
+  const handleMove = (from: Axial, to: Axial, chosen?: "M" | "T") => {
     if (state.turn !== player) return;
-    const next = applyMove(state, from, to);
+    const next = applyMove(state, from, to, chosen);
     if (next) {
       setState(next);
       setSelected(null);
