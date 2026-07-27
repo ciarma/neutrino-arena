@@ -3,6 +3,7 @@ import {
   allCells,
   axialToPixel,
   boardPixelBounds,
+  deploymentZone,
   hexCorners,
   key,
   type Axial,
@@ -94,15 +95,21 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
         const isSelected = selected && selected.q === cell.q && selected.r === cell.r;
         const isTarget = targets.has(k);
         const isCapture = isTarget && piece;
-        // Alternate cell tint based on (q + 2r) parity for a subtle pattern.
-        const shade = (cell.q + 2 * cell.r) % 2 === 0 ? "url(#cell-light)" : "url(#cell-dark)";
+        // Deployment zones are tinted light yellow / light purple; the rest is white.
+        const zone = deploymentZone(cell);
+        const fill =
+          zone === "yellow"
+            ? "oklch(0.96 0.06 92)"
+            : zone === "purple"
+              ? "oklch(0.92 0.05 305)"
+              : "oklch(0.99 0.005 100)";
 
         return (
           <g key={k} onClick={() => handleCellClick(cell)} style={{ cursor: disabled ? "default" : "pointer" }}>
             <polygon
               points={hexCorners(cx, cy, HEX_SIZE - 1)}
-              fill={shade}
-              stroke={isSelected ? "oklch(0.55 0.22 300)" : "oklch(0.75 0.02 90 / 0.5)"}
+              fill={fill}
+              stroke={isSelected ? "oklch(0.55 0.22 300)" : "oklch(0.65 0.02 90 / 0.55)"}
               strokeWidth={isSelected ? 3 : 1}
             />
             {isTarget && !isCapture && (
