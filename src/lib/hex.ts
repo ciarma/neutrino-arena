@@ -1,10 +1,14 @@
-// Hex grid utilities for a rhombus-shaped board using axial coordinates.
-// The board is an N x N rhombus: q in [0, N-1], r in [0, N-1].
+// Hex grid utilities for a 5x5 board displayed as a vertical diamond.
+// Underlying storage uses axial coordinates (q, r) both in [0, BOARD_SIZE - 1].
+// Visually, diamond rows correspond to (q + r): rows have widths 1,2,3,4,5,4,3,2,1.
 
-export const BOARD_SIZE = 7;
+export const BOARD_SIZE = 5;
+export const DIAMOND_ROWS = BOARD_SIZE * 2 - 1; // 9
+export const DEPLOYMENT_DEPTH = 3; // first / last 3 diamond rows
 
 export type Axial = { q: number; r: number };
 
+// The 6 hex axis directions (used for straight-line movement).
 export const DIRECTIONS: Axial[] = [
   { q: 1, r: 0 },
   { q: -1, r: 0 },
@@ -43,12 +47,28 @@ export function allCells(): Axial[] {
   return cells;
 }
 
-// Convert axial to pixel using pointy-top orientation.
-// The rhombus is laid so q grows to the right and r grows down-right,
-// producing a diamond visual.
+// Diamond row index (0 at top, DIAMOND_ROWS - 1 at bottom).
+export function diamondRow(a: Axial): number {
+  return a.q + a.r;
+}
+
+export type Faction = "yellow" | "purple";
+
+// Yellow deployment = top rows; purple deployment = bottom rows.
+export function deploymentZone(a: Axial): Faction | null {
+  const d = diamondRow(a);
+  if (d < DEPLOYMENT_DEPTH) return "yellow";
+  if (d > DIAMOND_ROWS - 1 - DEPLOYMENT_DEPTH) return "purple";
+  return null;
+}
+
+// Pixel mapping: vertical diamond.
+// Pointy-top hexes: horizontal spacing sqrt(3)*s between neighbours in the same
+// diamond row (which differ by (dq, dr) = (-1, +1) → (r - q) changes by 2).
+// Vertical spacing 1.5*s between adjacent diamond rows.
 export function axialToPixel(a: Axial, size: number): { x: number; y: number } {
-  const x = size * Math.sqrt(3) * (a.q + a.r / 2);
-  const y = size * (3 / 2) * a.r;
+  const x = (size * Math.sqrt(3) / 2) * (a.r - a.q);
+  const y = size * 1.5 * (a.q + a.r);
   return { x, y };
 }
 

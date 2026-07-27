@@ -1,4 +1,4 @@
-import { BOARD_SIZE, distance, inBounds, key, type Axial } from "./hex";
+import { BOARD_SIZE, DIRECTIONS, deploymentZone, distance, inBounds, key, type Axial } from "./hex";
 
 export type Faction = "yellow" | "purple";
 
@@ -19,27 +19,21 @@ export function otherFaction(f: Faction): Faction {
   return f === "yellow" ? "purple" : "yellow";
 }
 
-// Initial layout: 5 pieces per side placed along their home edge.
-// Yellow occupies r = 0 row (top of rhombus), purple occupies r = BOARD_SIZE - 1 (bottom).
+// Initial layout: every cell of each side's deployment zone (top/bottom 3
+// diamond rows) starts with a piece of that faction. Yellow at the top,
+// purple at the bottom, 6 pieces each.
 export function initialState(): GameState {
   const pieces: Record<string, Piece> = {};
   let idCounter = 0;
-  const makeId = (f: Faction) => `${f}-${idCounter++}`;
 
-  // Yellow: first row (r = 0), skip corners for a nicer starting spread
-  const yellowRow: Axial[] = [];
-  for (let q = 1; q < BOARD_SIZE - 1; q++) yellowRow.push({ q, r: 0 });
-  // Purple: last row (r = N-1)
-  const purpleRow: Axial[] = [];
-  for (let q = 1; q < BOARD_SIZE - 1; q++) purpleRow.push({ q, r: BOARD_SIZE - 1 });
-
-  for (const pos of yellowRow) {
-    const id = makeId("yellow");
-    pieces[key(pos)] = { id, owner: "yellow", pos };
-  }
-  for (const pos of purpleRow) {
-    const id = makeId("purple");
-    pieces[key(pos)] = { id, owner: "purple", pos };
+  for (let q = 0; q < BOARD_SIZE; q++) {
+    for (let r = 0; r < BOARD_SIZE; r++) {
+      const pos = { q, r };
+      const zone = deploymentZone(pos);
+      if (!zone) continue;
+      const id = `${zone}-${idCounter++}`;
+      pieces[key(pos)] = { id, owner: zone, pos };
+    }
   }
 
   return {
@@ -57,15 +51,22 @@ export function legalMoves(state: GameState, from: Axial): Axial[] {
   if (piece.owner !== state.turn) return [];
 
   const results: Axial[] = [];
-  for (let q = 0; q < BOARD_SIZE; q++) {
-    for (let r = 0; r < BOARD_SIZE; r++) {
-      const target = { q, r };
-      if (!inBounds(target)) continue;
-      const d = distance(from, target);
-      if (d < 1 || d > 2) continue;
+  // Straight-line moves of 1 or 2 steps along one of the 6 hex axes.
+  for (const dir of DIRECTIONS) {
+    for (let step = 1; step <= 2; step++) {
+      const target = { q: from.q + dir.q * step, r: from.r + dir.r * step };
+      if (!inBounds(target)) break;
+
+      // For a 2-step move, the intermediate cell must be empty (no jumping).
+      if (step === 2) {
+        const mid = { q: from.q + dir.q, r: from.r + dir.r };
+        if (state.pieces[key(mid)]) break;
+      }
+
       const occupant = state.pieces[key(target)];
-      if (occupant && occupant.owner === piece.owner) continue;
+      if (occupant && occupant.owner === piece.owner) break;
       results.push(target);
+      if (occupant) break; // capture ends the ray
     }
   }
   return results;
@@ -74,17 +75,17 @@ export function legalMoves(state: GameState, from: Axial): Axial[] {
 export function applyMove(state: GameState, from: Axial, to: Axial): GameState | null {
   const legal = legalMoves(state, from);
   if (!legal.some((m) => m.q === to.q && m.r === to.r)) return null;
+  // sanity: distance must be 1 or 2 (kept for defensive callers)
+  if (distance(from, to) < 1 || distance(from, to) > 2) return null;
 
   const piece = state.pieces[key(from)];
   if (!piece) return null;
 
   const newPieces: Record<string, Piece> = { ...state.pieces };
   delete newPieces[key(from)];
-  // Capture any piece on target
   delete newPieces[key(to)];
   newPieces[key(to)] = { ...piece, pos: to };
 
-  // Count remaining
   const remaining = { yellow: 0, purple: 0 };
   for (const p of Object.values(newPieces)) remaining[p.owner]++;
 
