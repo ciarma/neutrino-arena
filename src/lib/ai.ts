@@ -1,14 +1,23 @@
-import { applyMove, legalMoves, otherFaction, piecesOf, type Faction, type GameState } from "./game";
+import { applyMove, legalMoves, legalStateChoices, otherFaction, piecesOf, type Faction, type GameState } from "./game";
 import { BOARD_SIZE, type Axial } from "./hex";
 
-type Move = { from: Axial; to: Axial };
+type Move = { from: Axial; to: Axial; chosen?: "M" | "T" };
 
 function allMoves(state: GameState, faction: Faction): Move[] {
   const moves: Move[] = [];
   for (const piece of piecesOf(state, faction)) {
     if (piece.owner !== state.turn) continue;
     for (const to of legalMoves(state, piece.pos)) {
-      moves.push({ from: piece.pos, to });
+      const choices = legalStateChoices(state, piece.pos, to);
+      // For E + 2 steps on an empty cell there are two possible resulting
+      // states; enumerate both so the AI can pick.
+      if (piece.state === "E" && (Math.abs(to.q - piece.pos.q) + Math.abs(to.r - piece.pos.r) + Math.abs((to.q - piece.pos.q) + (to.r - piece.pos.r))) / 2 === 2) {
+        for (const c of choices) {
+          if (c === "M" || c === "T") moves.push({ from: piece.pos, to, chosen: c });
+        }
+      } else {
+        moves.push({ from: piece.pos, to });
+      }
     }
   }
   return moves;
@@ -19,8 +28,6 @@ function evaluate(state: GameState, ai: Faction): number {
   if (state.winner && state.winner !== ai) return -10000;
   const mine = piecesOf(state, ai).length;
   const theirs = piecesOf(state, otherFaction(ai)).length;
-  // Positional bonus: advance toward the opponent side of the diamond.
-  // Diamond row = q + r; yellow pushes toward higher rows, purple toward 0.
   const maxRow = (BOARD_SIZE - 1) * 2;
   let advance = 0;
   for (const p of piecesOf(state, ai)) {
@@ -38,7 +45,7 @@ function minimax(state: GameState, depth: number, ai: Faction, alpha: number, be
   if (isMax) {
     let best = -Infinity;
     for (const m of moves) {
-      const next = applyMove(state, m.from, m.to);
+      const next = applyMove(state, m.from, m.to, m.chosen);
       if (!next) continue;
       const score = minimax(next, depth - 1, ai, alpha, beta);
       best = Math.max(best, score);
@@ -49,7 +56,7 @@ function minimax(state: GameState, depth: number, ai: Faction, alpha: number, be
   } else {
     let best = Infinity;
     for (const m of moves) {
-      const next = applyMove(state, m.from, m.to);
+      const next = applyMove(state, m.from, m.to, m.chosen);
       if (!next) continue;
       const score = minimax(next, depth - 1, ai, alpha, beta);
       best = Math.min(best, score);
@@ -66,7 +73,7 @@ export function chooseAiMove(state: GameState, ai: Faction, depth = 2): Move | n
   let bestScore = -Infinity;
   let best: Move[] = [];
   for (const m of moves) {
-    const next = applyMove(state, m.from, m.to);
+    const next = applyMove(state, m.from, m.to, m.chosen);
     if (!next) continue;
     const score = minimax(next, depth - 1, ai, -Infinity, Infinity) + Math.random() * 0.5;
     if (score > bestScore) {

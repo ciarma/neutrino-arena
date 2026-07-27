@@ -91,10 +91,10 @@ function OnlineGame() {
   const state = row?.state ?? initialState();
   const disabled = !myFaction || state.turn !== myFaction || !!state.winner;
 
-  const handleMove = async (from: Axial, to: Axial) => {
+  const handleMove = async (from: Axial, to: Axial, chosen?: "M" | "T") => {
     if (!row || !myFaction) return;
     if (state.turn !== myFaction) return;
-    const next = applyMove(state, from, to);
+    const next = applyMove(state, from, to, chosen);
     if (!next) return;
     setSelected(null);
     setRow({ ...row, state: next });
