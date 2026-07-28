@@ -71,11 +71,11 @@ function Home() {
           <div>
             <h2 className="font-serif text-2xl">Come si gioca</h2>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-              <li>· La plancia è un rombo di caselle esagonali 7×7.</li>
+              <li>· La plancia è un rombo di caselle esagonali 1-2-3-4-5-4-3-2-1.</li>
               <li>· I gialli iniziano dall'alto, i viola dal basso.</li>
-              <li>· Muovi un pezzo di 1 o 2 caselle in qualsiasi direzione.</li>
-              <li>· Atterrando su un pezzo avversario, lo catturi.</li>
-              <li>· Vince chi resta l'unico sulla plancia.</li>
+              <li>· Muovi un pezzo di 1 o 2 caselle in linea retta; le pedine possono scavalcarsi.</li>
+              <li>· Ogni schieramento ha un Re (♛) al centro della terza fila: si muove ma non cattura.</li>
+              <li>· Vince chi cattura il Re avversario.</li>
             </ul>
           </div>
           <div className="rounded-2xl border border-border/40 bg-background/60 p-6">
