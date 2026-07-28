@@ -3,6 +3,7 @@ import {
   allCells,
   axialToPixel,
   boardPixelBounds,
+  cellName,
   deploymentZone,
   distance,
   hexCorners,
