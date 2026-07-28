@@ -4,6 +4,7 @@ import {
   DIRECTIONS,
   cellName,
   deploymentZone,
+  diamondRow,
   distance,
   inBounds,
   key,
