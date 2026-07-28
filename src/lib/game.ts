@@ -257,6 +257,13 @@ export function applyMove(
     arriving = ns;
   }
 
+  // Combat → enemy deployment requires the chosen arriving state to give check.
+  const fromInCombat = deploymentZone(from) === null;
+  const targetZone = deploymentZone(to);
+  if (fromInCombat && targetZone !== null && targetZone !== piece.owner) {
+    if (!threatensEnemyKing(state, piece, to, arriving)) return null;
+  }
+
   if (occupant && occupant.owner !== piece.owner && occupant.state !== arriving) {
     return null;
   }
