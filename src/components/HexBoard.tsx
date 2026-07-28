@@ -146,12 +146,30 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
                     cy={cy}
                     r={HEX_SIZE * 0.55}
                     fill={piece.owner === "yellow" ? "url(#piece-yellow)" : "url(#piece-purple)"}
-                    stroke={piece.owner === "yellow" ? "oklch(0.45 0.12 80)" : "oklch(0.22 0.12 295)"}
-                    strokeWidth={1.5}
+                    stroke={
+                      piece.kind === "king"
+                        ? "oklch(0.72 0.19 55)"
+                        : piece.owner === "yellow"
+                          ? "oklch(0.45 0.12 80)"
+                          : "oklch(0.22 0.12 295)"
+                    }
+                    strokeWidth={piece.kind === "king" ? 3 : 1.5}
                   />
+                  {piece.kind === "king" && (
+                    <text
+                      x={cx}
+                      y={cy - HEX_SIZE * 0.28}
+                      fontSize={HEX_SIZE * 0.38}
+                      textAnchor="middle"
+                      fill={piece.owner === "yellow" ? "oklch(0.35 0.15 60)" : "oklch(0.95 0.1 80)"}
+                      style={{ pointerEvents: "none" }}
+                    >
+                      ♛
+                    </text>
+                  )}
                   <text
                     x={cx}
-                    y={cy + HEX_SIZE * 0.14}
+                    y={cy + HEX_SIZE * 0.22}
                     fontSize={HEX_SIZE * 0.5}
                     fontWeight={700}
                     textAnchor="middle"
@@ -161,6 +179,23 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
                     {piece.state}
                   </text>
                 </g>
+              )}
+              {!piece && (
+                <text
+                  x={cx}
+                  y={cy + HEX_SIZE * 0.12}
+                  fontSize={HEX_SIZE * 0.28}
+                  textAnchor="middle"
+                  fill="oklch(0.6 0.02 90 / 0.6)"
+                  style={{
+                    pointerEvents: "none",
+                    fontFamily: "ui-monospace, Menlo, monospace",
+                    transform: `rotate(${-rotation}deg)`,
+                    transformOrigin: `${cx}px ${cy}px`,
+                  }}
+                >
+                  {cellName(cell)}
+                </text>
               )}
             </g>
           );
