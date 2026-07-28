@@ -73,20 +73,30 @@ function Home() {
 	      <li>Un giocatore controlla i <span className="italic text-[color:var(--faction-yellow)]">Neutrini</span>, l'altro gli <span className="italic text-[color:var(--faction-purple)]">Anti-Neutrini</span>. I neutrini esistono in 3 diversi tipi, o <b>Sapori</b>:  <span className="italic text-[color:blue]">Elettronico</span>, <span className="italic text-[color:green]">Muonico</span> e <span className="italic text-[color:red]">Tauonico</span>.</li>
 
 	      <li>Ogni giocatore ha 5 Pezzi Neutrino e 1 Pezzo Re Neutrino (♛).</li>
-	      <li>· Vince chi da <b>scacco matto al Re Neutrino avversario</b> oppure chi <b>cattura tutti gli altri Pezzi Neutrino</b>.</li>
+	      <li>· Vince chi da <b>Scacco Matto al Re Neutrino avversario</b> oppure chi <b>cattura tutti gli altri Pezzi Neutrino</b>.</li>
 
-	      <li>Neutrino Chess è un <b>gioco a turni</b>. Cominciando dal Primo Giocatore, ogni Giocatore può fare una delle seguenti <b>Azioni</b>: <b>Muovere</b> oppure <b>Schierare un Pezzo Catturato</b>.</li>
+	      <li>Neutrino Arena è un <b>gioco a turni</b>. Cominciando dal Primo Giocatore, ogni Giocatore può fare una delle seguenti <b>Azioni</b>: <b>Muovere</b> oppure <b>Schierare un Pezzo Catturato</b>.</li>
 
               <li><b>Muovere - </b>Muovi un Pezzo di 1 o 2 celle in linea retta (possono scavalcarsi). A causa del fenomeno dell’Oscillazione, il tuo Pezzo Neutrino <b>cambierà Sapore</b> a seconda della distanza percorsa.</li>
-	      <li>· La plancia è divisa in una Zona di Battaglia (al centro) e due Zone di Schieramento (da dove partono le due squadre). Dalla Zona di Schieramento puoi muovere solo <u>in avanti</u> verso la Zona di Battaglia. Dalla Zona di Battaglia <u>non si puo mai entrare</u> in una Zona di Schieramento.</li>
-	      <li>· Per <b>catturare</b> un pezzo avversario finisci il tuo movimento su di esso con il suo stesso Sapore.</li>
-	      
+	      <li>· Il tabellone è diviso in una Zona di Battaglia (al centro) e due Zone di Schieramento (da dove partono le due squadre). Dalla Zona di Schieramento puoi muovere solo <u>in avanti</u> verso la Zona di Battaglia. Dalla Zona di Battaglia <u>non si puo mai entrare</u> in una Zona di Schieramento.</li>
+	      <li>· Per <b>Catturare</b> un pezzo avversario finisci il tuo movimento su di esso con il suo stesso Sapore.</li>
+	      <li>· Se dopo una mossa un Re Neutrino potrebbe essere Catturato, si dice <b>Sotto Scacco</b> e deve essere mosso in un posto sicuro oppure rimossa la minaccia. <u>Attenzione: i Re Neutrino non possono Catturare i Pezzi Neutrino!</u> I Re Neutrino possono essere messi sotto scacco <b>anche quando si trovano nella Zona di Schieramento</b>. Se non c’è modo di salvare il Re allora si dice <b>Scacco Matto</b> e la partita finisce.</li>
+	      <li>· Muovere il proprio Re Neutrino in una cella nella quale sarebbe sotto scacco è una <b>mossa illegale</b>.</li>
+	      <li>· <u>I Re Neutrino possono “catturare” solo l’altro Re Neutrino.</u> Ciò significa che muovere il proprio Re Neutrino in una Cella dove potrebbe essere catturato dal Re Neutrino avversario è una <b>mossa illegale</b>.</li>
+	      <li> <b>Schierare un Pezzo Catturato - </b>Metti un Pezzo che hai Catturato in una cella libera della tua Zona di Schieramento (diventa del tuo colore). Non puoi cambiare il Sapore del Pezzo prima di Schierarlo. Da adesso in poi trattalo come uno qualsiasi dei tuoi Pezzi.</li>
             </ul>
           </div>
           <div className="rounded-2xl border border-border/40 bg-background/60 p-6">
             <p className="font-serif text-xl">In sviluppo</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Versione ancora in sviluppo. Mancano immagini e grafica, magari mettere il regolamento vero dal PDF, e alcune regole non sono ancora programmate bene. Poi aggiungere qui rimandi al sito INFN per approfondimenti.
+              Autore: Andrea Ciarma. Versione ancora in sviluppo. Mancano immagini e grafica, magari mettere il regolamento vero dal PDF, e alcune regole non sono ancora programmate bene. Poi aggiungere qui rimandi al sito INFN per approfondimenti.
+	      <li>fix entrare in zona schieramento avversaria</li>
+	      <li>moneta per chi inizia</li>
+	      <li>evidenzia lo scacco e richiedi la risoluzione</li>
+	      <li>schieramento</li>
+	      <li>tasto undo in locale e online</li>
+	      <li>[opz] dichiara vittoria allo scacco matto, non alla cattura del re</li>
+	      
             </p>
           </div>
         </section>
