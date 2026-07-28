@@ -20,7 +20,7 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/60 bg-card/50 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <Link to="/" className="font-serif text-lg tracking-tight text-foreground hover:text-primary transition">
             ← Rombo
           </Link>
@@ -31,7 +31,7 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 py-6">
+      <main className="mx-auto max-w-6xl px-4 py-6">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <FactionBadge faction="yellow" count={yellow} active={state.turn === "yellow" && !state.winner} perspective={perspective} />
           <div className="text-center text-sm text-muted-foreground">
@@ -50,11 +50,43 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
           <FactionBadge faction="purple" count={purple} active={state.turn === "purple" && !state.winner} perspective={perspective} />
         </div>
 
-        <div className="rounded-3xl border border-border/60 bg-card/40 p-4 shadow-inner">{children}</div>
+        <div className="grid gap-4 lg:grid-cols-[1fr_260px]">
+          <div className="rounded-3xl border border-border/60 bg-card/40 p-4 shadow-inner">{children}</div>
+          <MoveLog history={state.history ?? []} />
+        </div>
 
         {actions && <div className="mt-6 flex flex-wrap justify-center gap-3">{actions}</div>}
       </main>
     </div>
+  );
+}
+
+function MoveLog({ history }: { history: string[] }) {
+  const rows: Array<{ n: number; y?: string; p?: string }> = [];
+  for (let i = 0; i < history.length; i += 2) {
+    rows.push({ n: i / 2 + 1, y: history[i], p: history[i + 1] });
+  }
+  return (
+    <aside className="rounded-3xl border border-border/60 bg-card/40 p-4 shadow-inner lg:sticky lg:top-4 lg:max-h-[70vh] lg:overflow-auto">
+      <h2 className="mb-3 font-serif text-sm uppercase tracking-[0.2em] text-muted-foreground">
+        Registro mosse
+      </h2>
+      {rows.length === 0 ? (
+        <p className="text-xs text-muted-foreground">Nessuna mossa ancora.</p>
+      ) : (
+        <ol className="space-y-1 font-mono text-xs">
+          {rows.map((row) => (
+            <li key={row.n} className="grid grid-cols-[1.75rem_1fr_1fr] items-baseline gap-2">
+              <span className="tabular-nums text-muted-foreground">{row.n}.</span>
+              <span className="text-[color:var(--faction-yellow)]" style={{ filter: "brightness(0.75) saturate(1.4)" }}>
+                {row.y ?? ""}
+              </span>
+              <span className="text-[color:var(--faction-purple)]">{row.p ?? ""}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </aside>
   );
 }
 

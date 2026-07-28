@@ -47,6 +47,11 @@ export function allCells(): Axial[] {
   return cells;
 }
 
+// Chess-like coordinate: file letter from q (a..e), rank number from r (1..5).
+export function cellName(a: Axial): string {
+  return `${String.fromCharCode(97 + a.q)}${a.r + 1}`;
+}
+
 // Diamond row index (0 at top, DIAMOND_ROWS - 1 at bottom).
 export function diamondRow(a: Axial): number {
   return a.q + a.r;

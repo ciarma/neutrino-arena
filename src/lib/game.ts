@@ -1,13 +1,25 @@
-import { BOARD_SIZE, DIRECTIONS, deploymentZone, distance, inBounds, key, type Axial } from "./hex";
+import {
+  BOARD_SIZE,
+  DIAMOND_ROWS,
+  DIRECTIONS,
+  cellName,
+  deploymentZone,
+  distance,
+  inBounds,
+  key,
+  type Axial,
+} from "./hex";
 
 export type Faction = "yellow" | "purple";
 export type PieceState = "E" | "M" | "T";
+export type PieceKind = "pawn" | "king";
 
 export type Piece = {
   id: string;
   owner: Faction;
   pos: Axial;
   state: PieceState;
+  kind: PieceKind;
 };
 
 export type GameState = {
@@ -15,6 +27,7 @@ export type GameState = {
   turn: Faction;
   winner: Faction | null;
   moves: number;
+  history: string[]; // human-readable log, one entry per half-move
 };
 
 export function otherFaction(f: Faction): Faction {
@@ -33,7 +46,6 @@ export function nextState(current: PieceState, steps: 1 | 2, chosen?: "M" | "T")
   return steps === 1 ? "M" : "E";
 }
 
-// True iff the E piece needs the player to pick M or T for a 2-step move.
 export function needsStateChoice(piece: Piece, steps: 1 | 2): boolean {
   return piece.state === "E" && steps === 2;
 }
@@ -42,29 +54,58 @@ export function initialState(): GameState {
   const pieces: Record<string, Piece> = {};
   let idCounter = 0;
 
-  for (let q = 0; q < BOARD_SIZE; q++) {
-    for (let r = 0; r < BOARD_SIZE; r++) {
-      const pos = { q, r };
-      const zone = deploymentZone(pos);
-      if (!zone) continue;
-      const id = `${zone}-${idCounter++}`;
-      pieces[key(pos)] = { id, owner: zone, pos, state: "E" };
+  const cellsAtDiamondRow = (d: number): Axial[] => {
+    const row: Axial[] = [];
+    for (let q = 0; q < BOARD_SIZE; q++) {
+      const r = d - q;
+      if (r >= 0 && r < BOARD_SIZE) row.push({ q, r });
     }
-  }
+    row.sort((a, b) => a.q - b.q);
+    return row;
+  };
+
+  const place = (owner: Faction, rows: Array<{ d: number; state: PieceState }>) => {
+    for (const { d, state } of rows) {
+      const row = cellsAtDiamondRow(d);
+      row.forEach((pos, i) => {
+        // Middle of the 3-cell "E" row is the King.
+        const isKing = state === "E" && row.length === 3 && i === 1;
+        const id = `${owner}-${idCounter++}`;
+        pieces[key(pos)] = {
+          id,
+          owner,
+          pos,
+          state,
+          kind: isKing ? "king" : "pawn",
+        };
+      });
+    }
+  };
+
+  place("yellow", [
+    { d: 0, state: "T" },
+    { d: 1, state: "M" },
+    { d: 2, state: "E" },
+  ]);
+  place("purple", [
+    { d: DIAMOND_ROWS - 1, state: "T" },
+    { d: DIAMOND_ROWS - 2, state: "M" },
+    { d: DIAMOND_ROWS - 3, state: "E" },
+  ]);
 
   return {
     pieces,
     turn: "yellow",
     winner: null,
     moves: 0,
+    history: [],
   };
 }
 
 // Returns the set of legal target cells. Pieces move 1 or 2 in straight
-// hex lines and CAN jump over other pieces. A piece currently inside its
-// own deployment zone may only move to combat-zone (white) cells. Landing
-// on an opponent is only allowed if the arriving state equals the target's
-// state (capture); landing on an own piece is always blocked.
+// hex lines and CAN jump. A piece inside its own deployment zone may only
+// move to combat-zone (white) cells. Kings CANNOT capture. Landing on an
+// opponent is only allowed if the arriving state equals the target's state.
 export function legalMoves(state: GameState, from: Axial): Axial[] {
   const piece = state.pieces[key(from)];
   if (!piece) return [];
@@ -78,21 +119,17 @@ export function legalMoves(state: GameState, from: Axial): Axial[] {
     for (let step = 1 as 1 | 2; step <= 2; step = (step + 1) as 1 | 2) {
       const target = { q: from.q + dir.q * step, r: from.r + dir.r * step };
       if (!inBounds(target)) continue;
-
-      // Deployment zone restriction: can only move into combat (white) cells.
       if (fromInOwnDeployment && deploymentZone(target) !== null) continue;
 
       const occupant = state.pieces[key(target)];
       if (occupant) {
         if (occupant.owner === piece.owner) continue;
-        // Opponent: capture requires a matching final state.
+        // Kings cannot capture.
+        if (piece.kind === "king") continue;
         if (piece.state === "E") {
           if (step === 1) {
-            // E + 1 -> E ; capture only if opponent is E
             if (occupant.state !== "E") continue;
-          }
-          // E + 2 -> chosen M or T ; ok if opponent is M or T (player can pick)
-          else if (occupant.state === "E") continue;
+          } else if (occupant.state === "E") continue;
         } else {
           const ns = nextState(piece.state, step);
           if (ns !== occupant.state) continue;
@@ -104,9 +141,6 @@ export function legalMoves(state: GameState, from: Axial): Axial[] {
   return results;
 }
 
-// Legal state choices when moving `piece` by `steps`, given the target cell.
-// Returns [] if the move is illegal, or the list of possible resulting states
-// (length 1 for deterministic moves, up to 2 for E + 2 steps).
 export function legalStateChoices(state: GameState, from: Axial, to: Axial): PieceState[] {
   const piece = state.pieces[key(from)];
   if (!piece) return [];
@@ -120,7 +154,14 @@ export function legalStateChoices(state: GameState, from: Axial, to: Axial): Pie
       : [nextState(piece.state, steps)!];
   if (!occupant) return candidates;
   if (occupant.owner === piece.owner) return [];
+  if (piece.kind === "king") return [];
   return candidates.filter((s) => s === occupant.state);
+}
+
+function formatMove(piece: Piece, from: Axial, to: Axial, arriving: PieceState, captured: Piece | null): string {
+  const marker = piece.kind === "king" ? "♛" : "";
+  const sep = captured ? "x" : "→";
+  return `${marker}${cellName(from)}${sep}${cellName(to)}·${arriving}`;
 }
 
 export function applyMove(
@@ -140,12 +181,10 @@ export function applyMove(
   if (!piece) return null;
 
   const occupant = state.pieces[key(to)];
+  if (occupant && piece.kind === "king") return null;
 
-  // Resolve arriving state.
   let arriving: PieceState;
   if (piece.state === "E" && steps === 2) {
-    // For E-2: prefer the caller's choice; if there's an opponent to capture,
-    // it must match the opponent's state.
     if (occupant && occupant.owner !== piece.owner) {
       if (occupant.state !== "M" && occupant.state !== "T") return null;
       arriving = occupant.state;
@@ -159,28 +198,34 @@ export function applyMove(
     arriving = ns;
   }
 
-  // Final capture legality check (defensive).
   if (occupant && occupant.owner !== piece.owner && occupant.state !== arriving) {
     return null;
   }
+
+  const captured = occupant && occupant.owner !== piece.owner ? occupant : null;
 
   const newPieces: Record<string, Piece> = { ...state.pieces };
   delete newPieces[key(from)];
   delete newPieces[key(to)];
   newPieces[key(to)] = { ...piece, pos: to, state: arriving };
 
-  const remaining = { yellow: 0, purple: 0 };
-  for (const p of Object.values(newPieces)) remaining[p.owner]++;
-
+  // Winner = faction whose opponent's king was captured (or is missing).
+  const kings = { yellow: false, purple: false };
+  for (const p of Object.values(newPieces)) {
+    if (p.kind === "king") kings[p.owner] = true;
+  }
   let winner: Faction | null = null;
-  if (remaining.yellow === 0) winner = "purple";
-  else if (remaining.purple === 0) winner = "yellow";
+  if (!kings.yellow && kings.purple) winner = "purple";
+  else if (!kings.purple && kings.yellow) winner = "yellow";
+
+  const entry = formatMove(piece, from, to, arriving, captured);
 
   return {
     pieces: newPieces,
     turn: winner ? state.turn : otherFaction(state.turn),
     winner,
     moves: state.moves + 1,
+    history: [...(state.history ?? []), entry],
   };
 }
 
