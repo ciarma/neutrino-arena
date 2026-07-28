@@ -8,10 +8,10 @@ import type { Axial } from "@/lib/hex";
 export const Route = createFileRoute("/game/local")({
   head: () => ({
     meta: [
-      { title: "Partita locale — Rombo" },
-      { name: "description", content: "Gioca a Rombo in locale, due giocatori sullo stesso dispositivo." },
-      { property: "og:title", content: "Partita locale — Rombo" },
-      { property: "og:description", content: "Due giocatori, un dispositivo, una plancia esagonale a rombo." },
+      { title: "Partita locale — Neutrino Arena" },
+      { name: "description", content: "Gioca a Neutrino Arena in locale, due giocatori sullo stesso dispositivo." },
+      { property: "og:title", content: "Partita locale — Neutrino Arena" },
+      { property: "og:description", content: "Gioca a Neutrino Arena in locale, due giocatori sullo stesso dispositivo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
