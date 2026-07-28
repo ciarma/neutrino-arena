@@ -198,14 +198,23 @@ export function legalStateChoices(state: GameState, from: Axial, to: Axial): Pie
   if (d !== 1 && d !== 2) return [];
   const steps = d as 1 | 2;
   const occupant = state.pieces[key(to)];
-  const candidates: PieceState[] =
+  let candidates: PieceState[] =
     piece.state === "E" && steps === 2
       ? ["M", "T"]
       : [nextState(piece.state, steps)!];
-  if (!occupant) return candidates;
-  if (occupant.owner === piece.owner) return [];
-  if (piece.kind === "king") return [];
-  return candidates.filter((s) => s === occupant.state);
+  // Filter by capture state-matching rule.
+  if (occupant) {
+    if (occupant.owner === piece.owner) return [];
+    if (piece.kind === "king") return [];
+    candidates = candidates.filter((s) => s === occupant.state);
+  }
+  // Combat → enemy deployment: keep only choices that give check.
+  const fromInCombat = deploymentZone(from) === null;
+  const targetZone = deploymentZone(to);
+  if (fromInCombat && targetZone !== null && targetZone !== piece.owner) {
+    candidates = candidates.filter((s) => threatensEnemyKing(state, piece, to, s));
+  }
+  return candidates;
 }
 
 function formatMove(piece: Piece, from: Axial, to: Axial, arriving: PieceState, captured: Piece | null): string {
