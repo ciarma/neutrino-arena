@@ -22,7 +22,7 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
       <header className="border-b border-border/60 bg-card/50 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <Link to="/" className="font-serif text-lg tracking-tight text-foreground hover:text-primary transition">
-            ← Rombo
+            ← Neutrino Arena
           </Link>
           <div className="text-right">
             <h1 className="font-serif text-xl leading-tight">{title}</h1>
@@ -39,10 +39,10 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
               <>
                 {state.winner ? (
                   <span className="font-medium text-foreground">
-                    Vittoria {state.winner === "yellow" ? "gialla" : "viola"}
+                    Vittoria {state.winner === "yellow" ? "Neutrini" : "Anti-Neutrini"}
                   </span>
                 ) : (
-                  <span>Turno {state.turn === "yellow" ? "giallo" : "viola"} · mossa #{state.moves + 1}</span>
+                  <span>Turno {state.turn === "yellow" ? "Neutrini" : "Anti-Neutrini"} · mossa #{state.moves + 1}</span>
                 )}
               </>
             )}
@@ -122,7 +122,7 @@ function FactionBadge({
         }}
       />
       <span className="font-medium capitalize">
-        {faction === "yellow" ? "Giallo" : "Viola"}
+        {faction === "yellow" ? "Neutrini" : "Anti-Neutrini"}
         {isYou && <span className="ml-1 text-xs text-muted-foreground">(tu)</span>}
       </span>
       <span className="tabular-nums text-muted-foreground">{count} pezzi</span>
