@@ -3,9 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Rombo — Duello esagonale a due fazioni" },
+      { title: "Neutrino Arena" },
       { name: "description", content: "Un gioco da tavolo astratto su plancia esagonale a rombo. Giallo contro Viola: muovi, cattura, conquista. Locale, contro l'IA o online con un codice partita." },
-      { property: "og:title", content: "Rombo — Duello esagonale a due fazioni" },
+      { property: "og:title", content: "Neutrino Arena" },
       { property: "og:description", content: "Giallo contro Viola su una plancia esagonale a rombo. Gioca in locale, contro l'IA, o online con un codice partita." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -21,28 +21,27 @@ function Home() {
         <header className="mb-16 flex items-center justify-between">
           <div className="flex items-center gap-2 font-serif text-lg tracking-wide">
             <span className="inline-block h-3 w-3 rounded-full bg-[color:var(--faction-yellow)]" />
-            <span>Rombo</span>
+            <span>Neutrino Arena</span>
             <span className="inline-block h-3 w-3 rounded-full bg-[color:var(--faction-purple)]" />
           </div>
         </header>
 
         <section className="mb-16 max-w-2xl">
           <p className="mb-3 text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            Gioco da tavolo astratto
+            INFN GAME
           </p>
-          <h1 className="font-serif text-5xl leading-[1.05] tracking-tight text-foreground sm:text-6xl">
-            Un duello di{" "}
+          <h1 className="font-serif text-5xl leading-[1.05] tracking-tight text-foreground sm:text-5xl">
+            Una sfida tra{" "}
             <span className="italic text-[color:var(--faction-yellow)]" style={{ textShadow: "0 1px 0 oklch(0.45 0.12 80)" }}>
-              giallo
+              Neutrini
             </span>{" "}
             e{" "}
-            <span className="italic text-[color:var(--faction-purple)]">viola</span>
-            <br />
-            su una plancia a rombo.
+            <span className="italic text-[color:var(--faction-purple)]">Anti-Neutrini</span>
+            {" "}
+            basata sul fenomeno dell'Oscillazione.
           </h1>
           <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-            Ogni pezzo si muove di 1 o 2 caselle esagonali in qualsiasi direzione. Se finisce sopra
-            un avversario, lo cattura. Elimina tutti i pezzi dell'altra fazione per vincere.
+            I neutrini attraversano l’universo cambiando identità: in questo gioco fanno lo stesso sul tabellone. Neutrino Arena è un gioco da tavolo astratto che introduce il fenomeno dell’oscillazione dei neutrini attraverso meccaniche dinamiche. Strategia, intuizione e sorpresa si combinano in un’esperienza unica e coinvolgente alla scoperta di cosa sono i neutrini e perché sono così importanti.
           </p>
         </section>
 
@@ -71,18 +70,23 @@ function Home() {
           <div>
             <h2 className="font-serif text-2xl">Come si gioca</h2>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-              <li>· La plancia è un rombo di caselle esagonali 1-2-3-4-5-4-3-2-1.</li>
-              <li>· I gialli iniziano dall'alto, i viola dal basso.</li>
-              <li>· Muovi un pezzo di 1 o 2 caselle in linea retta; le pedine possono scavalcarsi.</li>
-              <li>· Ogni schieramento ha un Re (♛) al centro della terza fila: si muove ma non cattura.</li>
-              <li>· Vince chi cattura il Re avversario.</li>
+	      <li>Un giocatore controlla i <span className="italic text-[color:var(--faction-yellow)]">Neutrini</span>, l'altro gli <span className="italic text-[color:var(--faction-purple)]">Anti-Neutrini</span>. I neutrini esistono in 3 diversi tipi, o <b>Sapori</b>:  <span className="italic text-[color:blue]">Elettronico</span>, <span className="italic text-[color:green]">Muonico</span> e <span className="italic text-[color:red]">Tauonico</span>.</li>
+
+	      <li>Ogni giocatore ha 5 Pezzi Neutrino e 1 Pezzo Re Neutrino (♛).</li>
+	      <li>· Vince chi da <b>scacco matto al Re Neutrino avversario</b> oppure chi <b>cattura tutti gli altri Pezzi Neutrino</b>.</li>
+
+	      <li>Neutrino Chess è un <b>gioco a turni</b>. Cominciando dal Primo Giocatore, ogni Giocatore può fare una delle seguenti <b>Azioni</b>: <b>Muovere</b> oppure <b>Schierare un Pezzo Catturato</b>.</li>
+
+              <li><b>Muovere - </b>Muovi un Pezzo di 1 o 2 celle in linea retta (possono scavalcarsi). A causa del fenomeno dell’Oscillazione, il tuo Pezzo Neutrino <b>cambierà Sapore</b> a seconda della distanza percorsa.</li>
+	      <li>· La plancia è divisa in una Zona di Battaglia (al centro) e due Zone di Schieramento (da dove partono le due squadre). Dalla Zona di Schieramento puoi muovere solo <u>in avanti</u> verso la Zona di Battaglia. Dalla Zona di Battaglia <u>non si puo mai entrare</u> in una Zona di Schieramento.</li>
+	      <li>· Per <b>catturare</b> un pezzo avversario finisci il tuo movimento su di esso con il suo stesso Sapore.</li>
+	      
             </ul>
           </div>
           <div className="rounded-2xl border border-border/40 bg-background/60 p-6">
             <p className="font-serif text-xl">In sviluppo</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Prima versione con pezzi identici. Presto: pezzi con abilità diverse, formazioni iniziali
-              alternative e tornei.
+              Versione ancora in sviluppo. Mancano immagini e grafica, magari mettere il regolamento vero dal PDF, e alcune regole non sono ancora programmate bene. Poi aggiungere qui rimandi al sito INFN per approfondimenti.
             </p>
           </div>
         </section>
