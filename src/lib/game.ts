@@ -103,10 +103,47 @@ export function initialState(): GameState {
   };
 }
 
+// Forward direction for a faction (toward the enemy back rank).
+function isForwardMove(owner: Faction, from: Axial, to: Axial): boolean {
+  const df = diamondRow(from);
+  const dt = diamondRow(to);
+  return owner === "yellow" ? dt > df : dt < df;
+}
+
+// Would a piece at `pos` with arriving `state` threaten the enemy king
+// (i.e. be able to capture it in a single 1- or 2-step straight-line move)?
+function threatensEnemyKing(
+  gs: GameState,
+  mover: Piece,
+  pos: Axial,
+  arriving: PieceState,
+): boolean {
+  if (mover.kind === "king") return false; // kings cannot capture
+  const enemy = otherFaction(mover.owner);
+  const king = Object.values(gs.pieces).find((p) => p.kind === "king" && p.owner === enemy);
+  if (!king) return false;
+  for (const dir of DIRECTIONS) {
+    for (const step of [1, 2] as const) {
+      const t = { q: pos.q + dir.q * step, r: pos.r + dir.r * step };
+      if (t.q !== king.pos.q || t.r !== king.pos.r) continue;
+      if (arriving === "E" && step === 2) {
+        if (king.state === "M" || king.state === "T") return true;
+      } else {
+        const ns = nextState(arriving, step);
+        if (ns === king.state) return true;
+      }
+    }
+  }
+  return false;
+}
+
 // Returns the set of legal target cells. Pieces move 1 or 2 in straight
-// hex lines and CAN jump. A piece inside its own deployment zone may only
-// move to combat-zone (white) cells. Kings CANNOT capture. Landing on an
-// opponent is only allowed if the arriving state equals the target's state.
+// hex lines and CAN jump. Movement rules:
+//  - From own deployment zone: only forward (toward the opponent's side).
+//  - From combat zone: cannot enter any deployment cell, EXCEPT to give
+//    check to the enemy king (own deployment is never re-enterable).
+//  - Kings CANNOT capture. Landing on an opponent is only allowed if the
+//    arriving state equals the target's state.
 export function legalMoves(state: GameState, from: Axial): Axial[] {
   const piece = state.pieces[key(from)];
   if (!piece) return [];
@@ -114,27 +151,39 @@ export function legalMoves(state: GameState, from: Axial): Axial[] {
   if (piece.owner !== state.turn) return [];
 
   const fromInOwnDeployment = deploymentZone(from) === piece.owner;
+  const fromInCombat = deploymentZone(from) === null;
 
   const results: Axial[] = [];
   for (const dir of DIRECTIONS) {
     for (let step = 1 as 1 | 2; step <= 2; step = (step + 1) as 1 | 2) {
       const target = { q: from.q + dir.q * step, r: from.r + dir.r * step };
       if (!inBounds(target)) continue;
-      if (fromInOwnDeployment && deploymentZone(target) !== null) continue;
+
+      // Deployment/combat zone constraints on the target cell.
+      if (fromInOwnDeployment && !isForwardMove(piece.owner, from, target)) continue;
+
+      const targetZone = deploymentZone(target);
+      // Possible arriving states (E moving 2 has a choice between M and T).
+      const arrivingCandidates: PieceState[] =
+        piece.state === "E" && step === 2 ? ["M", "T"] : [nextState(piece.state, step)!];
+
+      if (fromInCombat && targetZone !== null) {
+        // Own deployment is never re-enterable.
+        if (targetZone === piece.owner) continue;
+        // Enemy deployment: only if the move gives check.
+        const givesCheck = arrivingCandidates.some((s) =>
+          threatensEnemyKing(state, piece, target, s),
+        );
+        if (!givesCheck) continue;
+      }
 
       const occupant = state.pieces[key(target)];
       if (occupant) {
         if (occupant.owner === piece.owner) continue;
         // Kings cannot capture.
         if (piece.kind === "king") continue;
-        if (piece.state === "E") {
-          if (step === 1) {
-            if (occupant.state !== "E") continue;
-          } else if (occupant.state === "E") continue;
-        } else {
-          const ns = nextState(piece.state, step);
-          if (ns !== occupant.state) continue;
-        }
+        // Require some arriving state that matches the occupant's state.
+        if (!arrivingCandidates.some((s) => s === occupant.state)) continue;
       }
       results.push(target);
     }
