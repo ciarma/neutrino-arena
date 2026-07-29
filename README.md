@@ -10,6 +10,7 @@ Versione webapp di Neutrino Arena, gioco astratto basato sull'oscillazione del s
 ## TODO
 - ~~[URG] fix entrata in deployZone~~
 - ~~[URG] due ulteriori chiarimenti sul re: 1) puo subire lo scacco anche se si trova nella zona di schieramento, 2) i re si possono dare scacco a vicenda~~
+- [URG] re E che si muove di 2 affianco a un M non mi da la possibilita di andare in M (safe)
 - moneta per chi inizia
 - [opz] tasto undo locale e online
 - [opz] dimensioni tabellone desktop
