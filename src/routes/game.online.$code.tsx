@@ -189,7 +189,14 @@ function OnlineGame() {
       }
     >
       <div className="space-y-3">
-        <ReserveTray state={state} faction={myFaction === "purple" ? "yellow" : "purple"} />
+        <ReserveTray
+          state={state}
+          faction="yellow"
+          label={myFaction === "yellow" ? "La tua riserva" : undefined}
+          selected={myFaction === "yellow" ? dropState : undefined}
+          onSelect={myFaction === "yellow" ? (s) => { setDropState(s); setSelected(null); } : undefined}
+          interactive={myFaction === "yellow"}
+        />
         <HexBoard
           state={state}
           selected={selected}
@@ -200,16 +207,14 @@ function OnlineGame() {
           dropState={dropState}
           onDrop={handleDrop}
         />
-        {myFaction && (
-          <ReserveTray
-            state={state}
-            faction={myFaction}
-            label="La tua riserva"
-            selected={dropState}
-            onSelect={(s) => { setDropState(s); setSelected(null); }}
-            interactive
-          />
-        )}
+        <ReserveTray
+          state={state}
+          faction="purple"
+          label={myFaction === "purple" ? "La tua riserva" : undefined}
+          selected={myFaction === "purple" ? dropState : undefined}
+          onSelect={myFaction === "purple" ? (s) => { setDropState(s); setSelected(null); } : undefined}
+          interactive={myFaction === "purple"}
+        />
       </div>
     </GameShell>
   );
