@@ -3,7 +3,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { GameShell } from "@/components/GameShell";
 import { HexBoard } from "@/components/HexBoard";
-import { applyMove, initialState, type Faction, type GameState } from "@/lib/game";
+import { applyDrop, applyMove, initialState, type Faction, type GameState, type PieceState } from "@/lib/game";
+import { ReserveTray } from "@/components/ReserveTray";
 import type { Axial } from "@/lib/hex";
 import { getOrCreatePlayerId } from "@/lib/player-id";
 
@@ -33,6 +34,7 @@ function OnlineGame() {
   const playerId = useMemo(() => getOrCreatePlayerId(), []);
   const [row, setRow] = useState<Row | null>(null);
   const [selected, setSelected] = useState<Axial | null>(null);
+  const [dropState, setDropState] = useState<PieceState | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -97,6 +99,21 @@ function OnlineGame() {
     const next = applyMove(state, from, to, chosen);
     if (!next) return;
     setSelected(null);
+    setDropState(null);
+    setRow({ ...row, state: next });
+    const { error } = await supabase
+      .from("games")
+      .update({ state: next as never, updated_at: new Date().toISOString() })
+      .eq("code", code);
+    if (error) setError(error.message);
+  };
+
+  const handleDrop = async (to: Axial) => {
+    if (!row || !myFaction || !dropState) return;
+    const next = applyDrop(state, myFaction, dropState, to);
+    if (!next) return;
+    setSelected(null);
+    setDropState(null);
     setRow({ ...row, state: next });
     const { error } = await supabase
       .from("games")
@@ -171,14 +188,29 @@ function OnlineGame() {
         </>
       }
     >
-      <HexBoard
-        state={state}
-        selected={selected}
-        onSelect={setSelected}
-        onMove={handleMove}
-        perspective={myFaction ?? "yellow"}
-        disabled={disabled}
-      />
+      <div className="space-y-3">
+        <ReserveTray state={state} faction={myFaction === "purple" ? "yellow" : "purple"} />
+        <HexBoard
+          state={state}
+          selected={selected}
+          onSelect={setSelected}
+          onMove={handleMove}
+          perspective={myFaction ?? "yellow"}
+          disabled={disabled}
+          dropState={dropState}
+          onDrop={handleDrop}
+        />
+        {myFaction && (
+          <ReserveTray
+            state={state}
+            faction={myFaction}
+            label="La tua riserva"
+            selected={dropState}
+            onSelect={(s) => { setDropState(s); setSelected(null); }}
+            interactive
+          />
+        )}
+      </div>
     </GameShell>
   );
 }
