@@ -159,7 +159,7 @@ function pseudoMoves(state: GameState, from: Axial, includeKingThreats = false):
       if (!inBounds(target)) continue;
 
       if (fromInOwnDeployment && !isForwardMove(piece.owner, from, target)) continue;
-
+      /*
       const targetZone = deploymentZone(target);
       let arrivingCandidates: PieceState[] =
         piece.state === "E" && step === 2 ? ["M", "T"] : [nextState(piece.state, step)!];
@@ -172,15 +172,40 @@ function pseudoMoves(state: GameState, from: Axial, includeKingThreats = false):
         if (arrivingCandidates.length === 0) continue;
       }
 
-      //const occupant = state.pieces[key(target)];
-      //if (occupant) {
-      //  if (occupant.owner === piece.owner) continue;
-      //  if (piece.kind === "king") continue;
-      //  arrivingCandidates = arrivingCandidates.filter((s) => s === occupant.state);
-      //  if (arrivingCandidates.length === 0) continue;
-      //}
-
       const occupant = state.pieces[key(target)];
+      */
+
+      const targetZone = deploymentZone(target);
+      const occupant = state.pieces[key(target)];
+
+      let arrivingCandidates: PieceState[] =
+        piece.state === "E" && step === 2
+          ? ["M", "T"]
+          : [nextState(piece.state, step)!];
+
+      if (fromInCombat && targetZone !== null) {
+        // Non si può mai rientrare nel proprio schieramento.
+        if (targetZone === piece.owner) continue;
+
+        const targetIsEnemyKing =
+          occupant?.owner !== piece.owner &&
+          occupant?.kind === "king";
+
+        if (targetIsEnemyKing) {
+          arrivingCandidates = arrivingCandidates.filter(
+            (s) => s === occupant.state,
+          );
+        } else {
+          arrivingCandidates = arrivingCandidates.filter((s) =>
+            threatensEnemyKing(state, piece, target, s),
+          );
+        }
+
+        if (arrivingCandidates.length === 0) continue;
+      }
+
+
+
       if (occupant) {
         if (occupant.owner === piece.owner) continue;
         if (piece.kind === "king") {
