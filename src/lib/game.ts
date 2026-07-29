@@ -313,31 +313,23 @@ export function applyMove(
   const occupant = state.pieces[key(to)];
   if (occupant && piece.kind === "king") return null;
 
+  const choices = legalStateChoices(state, from, to);
+  if (choices.length === 0) return null;
+
   let arriving: PieceState;
   if (piece.state === "E" && steps === 2) {
     if (occupant && occupant.owner !== piece.owner) {
-      if (occupant.state !== "M" && occupant.state !== "T") return null;
+      if (!choices.includes(occupant.state)) return null;
       arriving = occupant.state;
     } else {
       if (chosen !== "M" && chosen !== "T") return null;
+      if (!choices.includes(chosen)) return null;
       arriving = chosen;
     }
   } else {
-    const ns = nextState(piece.state, steps);
-    if (!ns) return null;
-    arriving = ns;
+    arriving = choices[0];
   }
 
-  // Combat → enemy deployment requires the chosen arriving state to give check.
-  const fromInCombat = deploymentZone(from) === null;
-  const targetZone = deploymentZone(to);
-  if (fromInCombat && targetZone !== null && targetZone !== piece.owner) {
-    if (!threatensEnemyKing(state, piece, to, arriving)) return null;
-  }
-
-  if (occupant && occupant.owner !== piece.owner && occupant.state !== arriving) {
-    return null;
-  }
 
   const captured = occupant && occupant.owner !== piece.owner ? occupant : null;
 
