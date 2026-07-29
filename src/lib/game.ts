@@ -342,11 +342,30 @@ export function applyMove(
   if (choices.length === 0) return null;
 
   let arriving: PieceState;
+  /*
   if (piece.state === "E" && steps === 2) {
     if (occupant && occupant.owner !== piece.owner) {
       if (!choices.includes(occupant.state)) return null;
       arriving = occupant.state;
     } else {
+      if (chosen !== "M" && chosen !== "T") return null;
+      if (!choices.includes(chosen)) return null;
+      arriving = chosen;
+    }
+  } else {
+    arriving = choices[0];
+  }
+  */
+  
+  if (piece.state === "E" && steps === 2) {
+    if (occupant && occupant.owner !== piece.owner) {
+      if (!choices.includes(occupant.state)) return null;
+      arriving = occupant.state;
+    } else if (choices.length === 1) {
+      // Una sola trasformazione è sicura: applicala automaticamente.
+      arriving = choices[0];
+    } else {
+      // Entrambe M e T sono sicure: serve la scelta del giocatore.
       if (chosen !== "M" && chosen !== "T") return null;
       if (!choices.includes(chosen)) return null;
       arriving = chosen;
