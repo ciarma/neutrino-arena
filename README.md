@@ -1,7 +1,7 @@
 # Neutrino Arena
 Autore: Andrea Ciarma
 
-Progetto: INFN GAME
+Progetto: INFN GAME https://web.infn.it/game/
 
 Inizio: 27/07/2026
 
