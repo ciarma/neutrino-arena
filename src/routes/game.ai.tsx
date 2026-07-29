@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { GameShell } from "@/components/GameShell";
 import { HexBoard } from "@/components/HexBoard";
-import { applyMove, initialState, type Faction } from "@/lib/game";
+import { applyDrop, applyMove, initialState, type Faction, type PieceState } from "@/lib/game";
+import { ReserveTray } from "@/components/ReserveTray";
 import { chooseAiMove } from "@/lib/ai";
 import type { Axial } from "@/lib/hex";
 
@@ -25,6 +26,7 @@ function AiGame() {
   const ai: Faction = "purple";
   const [state, setState] = useState(initialState());
   const [selected, setSelected] = useState<Axial | null>(null);
+  const [dropState, setDropState] = useState<PieceState | null>(null);
   const [thinking, setThinking] = useState(false);
 
   useEffect(() => {
@@ -48,6 +50,17 @@ function AiGame() {
     if (next) {
       setState(next);
       setSelected(null);
+      setDropState(null);
+    }
+  };
+
+  const handleDrop = (to: Axial) => {
+    if (!dropState || state.turn !== player) return;
+    const next = applyDrop(state, player, dropState, to);
+    if (next) {
+      setState(next);
+      setSelected(null);
+      setDropState(null);
     }
   };
 
@@ -61,15 +74,21 @@ function AiGame() {
     <GameShell title="Contro l'IA" subtitle="Sei il giallo" state={state} perspective={player} status={status}
       actions={
         <button
-          onClick={() => { setState(initialState()); setSelected(null); }}
+          onClick={() => { setState(initialState()); setSelected(null); setDropState(null); }}
           className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition"
         >
           Nuova partita
         </button>
       }
     >
-      <HexBoard state={state} selected={selected} onSelect={setSelected} onMove={handleMove}
-        perspective={player} disabled={thinking || state.turn !== player} />
+      <div className="space-y-3">
+        <ReserveTray state={state} faction={ai} />
+        <HexBoard state={state} selected={selected} onSelect={setSelected} onMove={handleMove}
+          perspective={player} disabled={thinking || state.turn !== player}
+          dropState={dropState} onDrop={handleDrop} />
+        <ReserveTray state={state} faction={player} selected={dropState}
+          onSelect={(s) => { setDropState(s); setSelected(null); }} interactive={!thinking} />
+      </div>
     </GameShell>
   );
 }
