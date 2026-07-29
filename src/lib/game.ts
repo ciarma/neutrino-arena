@@ -141,6 +141,93 @@ function threatensEnemyKing(
   return false;
 }
 
+export type PseudoMove = { to: Axial; arriving: PieceState };
+
+// All geometrically/zone-legal moves for a piece, ignoring turn order and
+// ignoring whether the move leaves one's own king in check.
+function pseudoMoves(state: GameState, from: Axial): PseudoMove[] {
+  const piece = state.pieces[key(from)];
+  if (!piece) return [];
+
+  const fromInOwnDeployment = deploymentZone(from) === piece.owner;
+  const fromInCombat = deploymentZone(from) === null;
+
+  const results: PseudoMove[] = [];
+  for (const dir of DIRECTIONS) {
+    for (let step = 1 as 1 | 2; step <= 2; step = (step + 1) as 1 | 2) {
+      const target = { q: from.q + dir.q * step, r: from.r + dir.r * step };
+      if (!inBounds(target)) continue;
+
+      if (fromInOwnDeployment && !isForwardMove(piece.owner, from, target)) continue;
+
+      const targetZone = deploymentZone(target);
+      let arrivingCandidates: PieceState[] =
+        piece.state === "E" && step === 2 ? ["M", "T"] : [nextState(piece.state, step)!];
+
+      if (fromInCombat && targetZone !== null) {
+        if (targetZone === piece.owner) continue;
+        arrivingCandidates = arrivingCandidates.filter((s) =>
+          threatensEnemyKing(state, piece, target, s),
+        );
+        if (arrivingCandidates.length === 0) continue;
+      }
+
+      const occupant = state.pieces[key(target)];
+      if (occupant) {
+        if (occupant.owner === piece.owner) continue;
+        if (piece.kind === "king") continue;
+        arrivingCandidates = arrivingCandidates.filter((s) => s === occupant.state);
+        if (arrivingCandidates.length === 0) continue;
+      }
+      for (const s of arrivingCandidates) results.push({ to: target, arriving: s });
+    }
+  }
+  return results;
+}
+
+function findKing(state: GameState, faction: Faction): Piece | undefined {
+  return Object.values(state.pieces).find((p) => p.kind === "king" && p.owner === faction);
+}
+
+// Is `faction`'s king currently attacked by the opponent?
+export function isInCheck(state: GameState, faction: Faction): boolean {
+  const king = findKing(state, faction);
+  if (!king) return false;
+  for (const p of Object.values(state.pieces)) {
+    if (p.owner === faction) continue;
+    for (const m of pseudoMoves(state, p.pos)) {
+      if (m.to.q === king.pos.q && m.to.r === king.pos.r) return true;
+    }
+  }
+  return false;
+}
+
+// Board after a raw move, used to test check-safety.
+function simulate(state: GameState, from: Axial, to: Axial, arriving: PieceState): GameState {
+  const piece = state.pieces[key(from)];
+  const newPieces: Record<string, Piece> = { ...state.pieces };
+  delete newPieces[key(from)];
+  delete newPieces[key(to)];
+  newPieces[key(to)] = { ...piece, pos: to, state: arriving };
+  return { ...state, pieces: newPieces };
+}
+
+function simulateDrop(state: GameState, faction: Faction, s: PieceState, to: Axial): GameState {
+  const newPieces: Record<string, Piece> = { ...state.pieces };
+  newPieces[key(to)] = {
+    id: `sim-${key(to)}`,
+    owner: faction,
+    pos: to,
+    state: s,
+    kind: "pawn",
+  };
+  return { ...state, pieces: newPieces };
+}
+
+function isSafe(state: GameState, owner: Faction, from: Axial, to: Axial, arriving: PieceState): boolean {
+  return !isInCheck(simulate(state, from, to, arriving), owner);
+}
+
 // Returns the set of legal target cells. Pieces move 1 or 2 in straight
 // hex lines and CAN jump. Movement rules:
 //  - From own deployment zone: only forward (toward the opponent's side).
@@ -148,49 +235,21 @@ function threatensEnemyKing(
 //    check to the enemy king (own deployment is never re-enterable).
 //  - Kings CANNOT capture. Landing on an opponent is only allowed if the
 //    arriving state equals the target's state.
+//  - A move may never leave (or keep) one's own king in check.
 export function legalMoves(state: GameState, from: Axial): Axial[] {
   const piece = state.pieces[key(from)];
   if (!piece) return [];
   if (state.winner) return [];
   if (piece.owner !== state.turn) return [];
 
-  const fromInOwnDeployment = deploymentZone(from) === piece.owner;
-  const fromInCombat = deploymentZone(from) === null;
-
+  const seen = new Set<string>();
   const results: Axial[] = [];
-  for (const dir of DIRECTIONS) {
-    for (let step = 1 as 1 | 2; step <= 2; step = (step + 1) as 1 | 2) {
-      const target = { q: from.q + dir.q * step, r: from.r + dir.r * step };
-      if (!inBounds(target)) continue;
-
-      // Deployment/combat zone constraints on the target cell.
-      if (fromInOwnDeployment && !isForwardMove(piece.owner, from, target)) continue;
-
-      const targetZone = deploymentZone(target);
-      // Possible arriving states (E moving 2 has a choice between M and T).
-      const arrivingCandidates: PieceState[] =
-        piece.state === "E" && step === 2 ? ["M", "T"] : [nextState(piece.state, step)!];
-
-      if (fromInCombat && targetZone !== null) {
-        // Own deployment is never re-enterable.
-        if (targetZone === piece.owner) continue;
-        // Enemy deployment: only if the move gives check.
-        const givesCheck = arrivingCandidates.some((s) =>
-          threatensEnemyKing(state, piece, target, s),
-        );
-        if (!givesCheck) continue;
-      }
-
-      const occupant = state.pieces[key(target)];
-      if (occupant) {
-        if (occupant.owner === piece.owner) continue;
-        // Kings cannot capture.
-        if (piece.kind === "king") continue;
-        // Require some arriving state that matches the occupant's state.
-        if (!arrivingCandidates.some((s) => s === occupant.state)) continue;
-      }
-      results.push(target);
-    }
+  for (const m of pseudoMoves(state, from)) {
+    if (!isSafe(state, piece.owner, from, m.to, m.arriving)) continue;
+    const k = key(m.to);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    results.push(m.to);
   }
   return results;
 }
@@ -198,28 +257,36 @@ export function legalMoves(state: GameState, from: Axial): Axial[] {
 export function legalStateChoices(state: GameState, from: Axial, to: Axial): PieceState[] {
   const piece = state.pieces[key(from)];
   if (!piece) return [];
-  const d = distance(from, to);
-  if (d !== 1 && d !== 2) return [];
-  const steps = d as 1 | 2;
-  const occupant = state.pieces[key(to)];
-  let candidates: PieceState[] =
-    piece.state === "E" && steps === 2
-      ? ["M", "T"]
-      : [nextState(piece.state, steps)!];
-  // Filter by capture state-matching rule.
-  if (occupant) {
-    if (occupant.owner === piece.owner) return [];
-    if (piece.kind === "king") return [];
-    candidates = candidates.filter((s) => s === occupant.state);
-  }
-  // Combat → enemy deployment: keep only choices that give check.
-  const fromInCombat = deploymentZone(from) === null;
-  const targetZone = deploymentZone(to);
-  if (fromInCombat && targetZone !== null && targetZone !== piece.owner) {
-    candidates = candidates.filter((s) => threatensEnemyKing(state, piece, to, s));
-  }
-  return candidates;
+  return pseudoMoves(state, from)
+    .filter((m) => m.to.q === to.q && m.to.r === to.r)
+    .filter((m) => isSafe(state, piece.owner, from, m.to, m.arriving))
+    .map((m) => m.arriving);
 }
+
+// Does the faction have any legal action left (move or drop)?
+export function hasAnyLegalAction(state: GameState, faction: Faction): boolean {
+  for (const p of Object.values(state.pieces)) {
+    if (p.owner !== faction) continue;
+    for (const m of pseudoMoves(state, p.pos)) {
+      if (isSafe(state, faction, p.pos, m.to, m.arriving)) return true;
+    }
+  }
+  const reserve = reservesOf(state, faction);
+  if (reserve.length > 0) {
+    for (const c of allCells()) {
+      if (deploymentZone(c) !== faction || state.pieces[key(c)]) continue;
+      for (const s of reserve) {
+        if (!isInCheck(simulateDrop(state, faction, s, c), faction)) return true;
+      }
+    }
+  }
+  return false;
+}
+
+export function isCheckmate(state: GameState, faction: Faction): boolean {
+  return isInCheck(state, faction) && !hasAnyLegalAction(state, faction);
+}
+
 
 function formatMove(piece: Piece, from: Axial, to: Axial, arriving: PieceState, captured: Piece | null): string {
   const marker = piece.kind === "king" ? "♛" : "";
