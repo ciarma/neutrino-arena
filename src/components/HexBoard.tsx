@@ -10,7 +10,7 @@ import {
   key,
   type Axial,
 } from "@/lib/hex";
-import { legalMoves, legalStateChoices, type Faction, type GameState } from "@/lib/game";
+import { legalDrops, legalMoves, legalStateChoices, type Faction, type GameState, type PieceState } from "@/lib/game";
 
 type Props = {
   state: GameState;
@@ -19,13 +19,19 @@ type Props = {
   onMove: (from: Axial, to: Axial, chosen?: "M" | "T") => void;
   perspective?: Faction;
   disabled?: boolean;
+  dropState?: PieceState | null;
+  onDrop?: (to: Axial) => void;
 };
 
 const HEX_SIZE = 34;
 
-export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled }: Props) {
+export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled, dropState = null, onDrop }: Props) {
   const bounds = useMemo(() => boardPixelBounds(HEX_SIZE), []);
   const cells = useMemo(() => allCells(), []);
+  const dropTargets = useMemo(() => {
+    if (!dropState) return new Set<string>();
+    return new Set(legalDrops(state, state.turn).map(key));
+  }, [state, dropState]);
   const targets = useMemo(() => {
     if (!selected) return new Set<string>();
     return new Set(legalMoves(state, selected).map(key));
@@ -40,6 +46,11 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
     if (disabled) return;
     const k = key(cell);
     const piece = state.pieces[k];
+
+    if (dropState) {
+      if (dropTargets.has(k)) onDrop?.(cell);
+      return;
+    }
 
     if (selected) {
       const isTarget = targets.has(k);
@@ -94,6 +105,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
           const k = key(cell);
           const piece = state.pieces[k];
           const isSelected = selected && selected.q === cell.q && selected.r === cell.r;
+          const isDropTarget = dropTargets.has(k);
           const isTarget = targets.has(k);
           const isCapture = isTarget && piece;
           const zone = deploymentZone(cell);
@@ -111,9 +123,18 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
               <polygon
                 points={hexCorners(cx, cy, HEX_SIZE - 1)}
                 fill={fill}
-                stroke={isSelected ? "oklch(0.55 0.22 300)" : "oklch(0.65 0.02 90 / 0.55)"}
-                strokeWidth={isSelected ? 3 : 1}
+                stroke={
+                  isSelected
+                    ? "oklch(0.55 0.22 300)"
+                    : isDropTarget
+                      ? "oklch(0.62 0.2 150)"
+                      : "oklch(0.65 0.02 90 / 0.55)"
+                }
+                strokeWidth={isSelected || isDropTarget ? 3 : 1}
               />
+              {isDropTarget && (
+                <circle cx={cx} cy={cy} r={HEX_SIZE * 0.3} fill="oklch(0.62 0.2 150 / 0.3)" />
+              )}
               {isTarget && !isCapture && (
                 <circle cx={cx} cy={cy} r={HEX_SIZE * 0.28} fill="oklch(0.55 0.22 300 / 0.35)" />
               )}
