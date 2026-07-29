@@ -1,5 +1,6 @@
 import {
   BOARD_SIZE,
+  allCells,
   DIAMOND_ROWS,
   DIRECTIONS,
   cellName,
@@ -25,6 +26,8 @@ export type Piece = {
 
 export type GameState = {
   pieces: Record<string, Piece>; // keyed by hex "q,r"
+  // Captured enemy pieces held by each faction, ready to be redeployed.
+  reserves: Record<Faction, PieceState[]>;
   turn: Faction;
   winner: Faction | null;
   moves: number;
@@ -96,6 +99,7 @@ export function initialState(): GameState {
 
   return {
     pieces,
+    reserves: { yellow: [], purple: [] },
     turn: "yellow",
     winner: null,
     moves: 0,
@@ -286,12 +290,70 @@ export function applyMove(
 
   const entry = formatMove(piece, from, to, arriving, captured);
 
+  const newReserves: Record<Faction, PieceState[]> = {
+    yellow: [...reservesOf(state, "yellow")],
+    purple: [...reservesOf(state, "purple")],
+  };
+  if (captured && captured.kind !== "king") {
+    newReserves[piece.owner] = [...newReserves[piece.owner], captured.state];
+  }
+
   return {
     pieces: newPieces,
+    reserves: newReserves,
     turn: winner ? state.turn : otherFaction(state.turn),
     winner,
     moves: state.moves + 1,
     history: [...(state.history ?? []), entry],
+  };
+}
+
+export function reservesOf(state: GameState, faction: Faction): PieceState[] {
+  return state.reserves?.[faction] ?? [];
+}
+
+// Free cells of one's own deployment zone, where captured pieces can be redeployed.
+export function legalDrops(state: GameState, faction: Faction): Axial[] {
+  if (state.winner) return [];
+  if (state.turn !== faction) return [];
+  if (reservesOf(state, faction).length === 0) return [];
+  return allCells().filter((c) => deploymentZone(c) === faction && !state.pieces[key(c)]);
+}
+
+export function applyDrop(
+  state: GameState,
+  faction: Faction,
+  pieceState: PieceState,
+  to: Axial,
+): GameState | null {
+  if (state.turn !== faction || state.winner) return null;
+  const reserve = reservesOf(state, faction);
+  const idx = reserve.indexOf(pieceState);
+  if (idx === -1) return null;
+  if (!legalDrops(state, faction).some((c) => c.q === to.q && c.r === to.r)) return null;
+
+  const newReserves: Record<Faction, PieceState[]> = {
+    yellow: [...reservesOf(state, "yellow")],
+    purple: [...reservesOf(state, "purple")],
+  };
+  newReserves[faction].splice(idx, 1);
+
+  const newPieces: Record<string, Piece> = { ...state.pieces };
+  newPieces[key(to)] = {
+    id: `${faction}-drop-${state.moves}-${key(to)}`,
+    owner: faction,
+    pos: to,
+    state: pieceState,
+    kind: "pawn",
+  };
+
+  return {
+    pieces: newPieces,
+    reserves: newReserves,
+    turn: otherFaction(faction),
+    winner: null,
+    moves: state.moves + 1,
+    history: [...(state.history ?? []), `${pieceState}*${cellName(to)}`],
   };
 }
 
