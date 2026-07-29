@@ -8,10 +8,10 @@ Inizio: 27/07/2026
 Versione webapp di Neutrino Arena, gioco astratto basato sull'oscillazione del sapore dei neutrini.
 
 ## TODO
-- due ulteriori chiarimenti sul re: 1) puo subire lo scacco anche se si trova nella zona di schieramento, 2) i re si possono dare scacco a vicenda
+- [URG] fix entrata in deployZone
+- [URG] due ulteriori chiarimenti sul re: 1) puo subire lo scacco anche se si trova nella zona di schieramento, 2) i re si possono dare scacco a vicenda
 - moneta per chi inizia
 - [opz] tasto undo locale e online
-- fix entrata in deployZone
 - [opz] dimensioni tabellone desktop
 - immagini pedine
 - immagini tabellone
