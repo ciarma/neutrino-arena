@@ -89,13 +89,8 @@ function Home() {
           <div className="rounded-2xl border border-border/40 bg-background/60 p-6">
             <p className="font-serif text-xl">In sviluppo</p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Autore: Andrea Ciarma. Versione ancora in sviluppo. Mancano immagini e grafica, magari mettere il regolamento vero dal PDF, e alcune regole non sono ancora programmate bene. Poi aggiungere qui rimandi al sito INFN per approfondimenti.
-	      <li>fix entrare in zona schieramento avversaria</li>
-	      <li>moneta per chi inizia</li>
-	      <li>evidenzia lo scacco e richiedi la risoluzione</li>
-	      <li>schieramento</li>
-	      <li>tasto undo in locale e online</li>
-	      <li>[opz] dichiara vittoria allo scacco matto, non alla cattura del re</li>
+              Autore: Andrea Ciarma.
+			  Progetto INFN GAME <a href="https://web.infn.it/game/">Sito Web del Progetto</a>
 	      
             </p>
           </div>
