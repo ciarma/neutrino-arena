@@ -30,12 +30,22 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
   const cells = useMemo(() => allCells(), []);
   const dropTargets = useMemo(() => {
     if (!dropState) return new Set<string>();
-    return new Set(legalDrops(state, state.turn).map(key));
+    return new Set(legalDrops(state, state.turn, dropState).map(key));
   }, [state, dropState]);
   const targets = useMemo(() => {
     if (!selected) return new Set<string>();
     return new Set(legalMoves(state, selected).map(key));
   }, [state, selected]);
+  // King currently under check (highlighted on the board).
+  const checkedKingKey = useMemo(() => {
+    for (const f of ["yellow", "purple"] as Faction[]) {
+      if (!isInCheck(state, f)) continue;
+      const king = Object.values(state.pieces).find((p) => p.kind === "king" && p.owner === f);
+      if (king) return key(king.pos);
+    }
+    return null;
+  }, [state]);
+
 
   // For E + 2 steps on an empty cell we need to ask the player M or T.
   const [pending, setPending] = useState<{ from: Axial; to: Axial } | null>(null);
