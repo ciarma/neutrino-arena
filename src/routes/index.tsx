@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import PdfViewerModal from "@/components/PdfViewerModal";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -98,6 +99,14 @@ function Home() {
 			  >Sito Web del Progetto</a>
 	      
             </p>
+	    <PdfViewerModal />
+	    <a
+  		href="/NeutrinoChess_rulebook_fisico_1v2_compressed.pdf"
+  		download
+  		className="text-sm font-medium hover:underline"
+	    >
+  Scarica PDF
+</a>
           </div>
         </section>
       </div>
