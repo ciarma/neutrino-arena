@@ -7,9 +7,9 @@ import { getOrCreatePlayerId } from "@/lib/player-id";
 export const Route = createFileRoute("/game/online/")({
   head: () => ({
     meta: [
-      { title: "Partita online — Rombo" },
-      { name: "description", content: "Crea una partita di Rombo online e condividi il codice, oppure inserisci il codice per unirti a un amico." },
-      { property: "og:title", content: "Partita online — Rombo" },
+      { title: "Partita online — Neutrino Arena" },
+      { name: "description", content: "Crea una partita di Neutrino Arena online e condividi il codice, oppure inserisci il codice per unirti a un amico." },
+      { property: "og:title", content: "Partita online — Neutrino Arena" },
       { property: "og:description", content: "Multiplayer con codice partita: crea o inserisci il codice per iniziare." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

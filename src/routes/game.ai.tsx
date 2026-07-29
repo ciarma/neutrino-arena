@@ -10,10 +10,10 @@ import type { Axial } from "@/lib/hex";
 export const Route = createFileRoute("/game/ai")({
   head: () => ({
     meta: [
-      { title: "Contro l'IA — Rombo" },
-      { name: "description", content: "Sfida l'intelligenza artificiale in una partita di Rombo sulla plancia esagonale a rombo." },
-      { property: "og:title", content: "Contro l'IA — Rombo" },
-      { property: "og:description", content: "Un giocatore contro l'IA su plancia esagonale." },
+      { title: "Contro l'IA — Neutrino Arena" },
+      { name: "description", content: "Sfida l'intelligenza artificiale in una partita di Neutrino Arena." },
+      { property: "og:title", content: "Contro l'IA — Neutrino Arena" },
+      { property: "og:description", content: "Gioca a Neutrino Arena contro l'IA." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

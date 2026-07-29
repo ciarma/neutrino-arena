@@ -11,10 +11,10 @@ import { getOrCreatePlayerId } from "@/lib/player-id";
 export const Route = createFileRoute("/game/online/$code")({
   head: ({ params }) => ({
     meta: [
-      { title: `Partita ${params.code} — Rombo` },
-      { name: "description", content: `Partita online di Rombo, codice ${params.code}. Duello a due fazioni su plancia esagonale.` },
-      { property: "og:title", content: `Partita ${params.code} — Rombo` },
-      { property: "og:description", content: "Duello a due fazioni su plancia esagonale a rombo." },
+      { title: `Partita ${params.code} — Neutrino Arena` },
+      { name: "description", content: `Partita online di Neutrino Arena, codice ${params.code}. Duello a due fazioni su plancia esagonale.` },
+      { property: "og:title", content: `Partita ${params.code} — Neutrino Arena` },
+      { property: "og:description", content: "Gioca a Neutrino Arena online." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
