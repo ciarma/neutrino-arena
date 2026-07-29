@@ -48,7 +48,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
 
 
   // For E + 2 steps on an empty cell we need to ask the player M or T.
-  const [pending, setPending] = useState<{ from: Axial; to: Axial } | null>(null);
+  const [pending, setPending] = useState<{ from: Axial; to: Axial; choices: PieceState[] } | null>(null);
 
   const rotation = perspective === "purple" ? 180 : 0;
 
@@ -67,7 +67,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
       if (isTarget) {
         const choices = legalStateChoices(state, selected, cell);
         if (choices.length > 1) {
-          setPending({ from: selected, to: cell });
+          setPending({ from: selected, to: cell, choices });
           return;
         }
         onMove(selected, cell);
@@ -255,18 +255,17 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
               Scegli lo stato di arrivo della pedina (mossa di 2 passi da <strong>E</strong>).
             </p>
             <div className="flex justify-center gap-3">
-              <button
-                onClick={() => { const p = pending; setPending(null); onMove(p.from, p.to, "M"); }}
-                className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition"
-              >
-                M
-              </button>
-              <button
-                onClick={() => { const p = pending; setPending(null); onMove(p.from, p.to, "T"); }}
-                className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition"
-              >
-                T
-              </button>
+              {(["M", "T"] as const)
+                .filter((s) => pending.choices.includes(s))
+                .map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => { const p = pending; setPending(null); onMove(p.from, p.to, s); }}
+                    className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition"
+                  >
+                    {s}
+                  </button>
+                ))}
               <button
                 onClick={() => setPending(null)}
                 className="rounded-full border border-border px-5 py-2 text-sm font-medium hover:bg-accent transition"
