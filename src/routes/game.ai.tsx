@@ -4,7 +4,7 @@ import { GameShell } from "@/components/GameShell";
 import { HexBoard } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type Faction, type PieceState } from "@/lib/game";
 import { ReserveTray } from "@/components/ReserveTray";
-import { chooseAiMove } from "@/lib/ai";
+import { applyAiMove, chooseAiMove } from "@/lib/ai";
 import type { Axial } from "@/lib/hex";
 
 export const Route = createFileRoute("/game/ai")({
@@ -36,7 +36,7 @@ function AiGame() {
     const timeout = setTimeout(() => {
       const move = chooseAiMove(state, ai, 2);
       if (move) {
-        const next = applyMove(state, move.from, move.to, move.chosen);
+        const next = applyAiMove(state, ai, move);
         if (next) setState(next);
       }
       setThinking(false);
