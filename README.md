@@ -12,7 +12,11 @@ Versione webapp di Neutrino Arena, gioco astratto basato sull'oscillazione del s
 - moneta per chi inizia
 - [opz] tasto undo locale e online
 - fix entrata in deployZone
-- 
+- [opz] dimensioni tabellone desktop
+- immagini pedine
+- immagini tabellone
+- immagini home
+- tasto regole PDF in game
 
 ---
 This project was built with [Lovable](https://lovable.dev).
