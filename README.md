@@ -1,19 +1,25 @@
 # Neutrino Arena
 Autore: Andrea Ciarma
+
 Progetto: INFN GAME
-Inizio: 27/02/2026
+
+Inizio: 27/07/2026
 
 Versione webapp di Neutrino Arena, gioco astratto basato sull'oscillazione del sapore dei neutrini.
 
-# Welcome to your Lovable project
+## TODO
+- due ulteriori chiarimenti sul re: 1) puo subire lo scacco anche se si trova nella zona di schieramento, 2) i re si possono dare scacco a vicenda
+- moneta per chi inizia
+- [opz] tasto undo locale e online
+- fix entrata in deployZone
+- 
 
+---
 This project was built with [Lovable](https://lovable.dev).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
 - **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
 - **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
 
 Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
@@ -24,7 +30,7 @@ npm i
 npm run dev
 ```
 
-## Built with
+Built with
 
 - TanStack Start
 - TypeScript
