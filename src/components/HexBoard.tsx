@@ -10,7 +10,7 @@ import {
   key,
   type Axial,
 } from "@/lib/hex";
-import { legalDrops, legalMoves, legalStateChoices, type Faction, type GameState, type PieceState } from "@/lib/game";
+import { isInCheck, legalDrops, legalMoves, legalStateChoices, type Faction, type GameState, type PieceState } from "@/lib/game";
 
 type Props = {
   state: GameState;
