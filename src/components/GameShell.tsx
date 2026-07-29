@@ -32,6 +32,11 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6">
+        {!state.winner && isInCheck(state, state.turn) && (
+          <div className="mb-4 rounded-2xl border-2 border-destructive/70 bg-destructive/10 px-4 py-3 text-center text-sm font-medium text-destructive">
+            SCACCO al Re {state.turn === "yellow" ? "Neutrini" : "Anti-Neutrini"} — devi risolvere lo scacco con questa mossa.
+          </div>
+        )}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <FactionBadge faction="yellow" count={yellow} active={state.turn === "yellow" && !state.winner} perspective={perspective} />
           <div className="text-center text-sm text-muted-foreground">
@@ -49,6 +54,7 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
           </div>
           <FactionBadge faction="purple" count={purple} active={state.turn === "purple" && !state.winner} perspective={perspective} />
         </div>
+
 
         <div className="grid gap-4 lg:grid-cols-[1fr_260px]">
           <div className="rounded-3xl border border-border/60 bg-card/40 p-4 shadow-inner">{children}</div>
