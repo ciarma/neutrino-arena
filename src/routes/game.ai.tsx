@@ -6,6 +6,7 @@ import { applyDrop, applyMove, initialState, type Faction, type PieceState } fro
 import { ReserveTray } from "@/components/ReserveTray";
 import { applyAiMove, chooseAiMove } from "@/lib/ai";
 import type { Axial } from "@/lib/hex";
+import PdfViewerModal from "@/components/PdfViewerModal";
 
 export const Route = createFileRoute("/game/ai")({
   head: () => ({
@@ -73,12 +74,15 @@ function AiGame() {
   return (
     <GameShell title="Contro l'IA" subtitle="Sei il giallo" state={state} perspective={player} status={status}
       actions={
+	<div className="flex items-center gap-3">
+	<PdfViewerModal />
         <button
           onClick={() => { setState(initialState()); setSelected(null); setDropState(null); }}
           className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition"
         >
           Nuova partita
         </button>
+	</div>
       }
     >
       <div className="space-y-3">

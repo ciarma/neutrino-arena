@@ -5,6 +5,7 @@ import { HexBoard } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type PieceState } from "@/lib/game";
 import { ReserveTray } from "@/components/ReserveTray";
 import type { Axial } from "@/lib/hex";
+import PdfViewerModal from "@/components/PdfViewerModal";
 
 export const Route = createFileRoute("/game/local")({
   head: () => ({
@@ -47,12 +48,15 @@ function LocalGame() {
   return (
     <GameShell title="Partita locale" subtitle="Due giocatori, stesso dispositivo" state={state}
       actions={
+	<div className="flex items-center gap-3">
+	<PdfViewerModal />
         <button
           onClick={() => { setState(initialState()); setSelected(null); setDropState(null); }}
           className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition"
         >
           Nuova partita
         </button>
+	</div>
       }
     >
       <div className="space-y-3">

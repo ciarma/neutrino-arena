@@ -7,6 +7,7 @@ import { applyDrop, applyMove, initialState, type Faction, type GameState, type 
 import { ReserveTray } from "@/components/ReserveTray";
 import type { Axial } from "@/lib/hex";
 import { getOrCreatePlayerId } from "@/lib/player-id";
+import PdfViewerModal from "@/components/PdfViewerModal";
 
 export const Route = createFileRoute("/game/online/$code")({
   head: ({ params }) => ({
@@ -170,7 +171,8 @@ function OnlineGame() {
       perspective={myFaction ?? "yellow"}
       status={status}
       actions={
-        <>
+        <div className="flex items-center gap-3">
+	<PdfViewerModal />
           <button
             onClick={shareCode}
             className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition"
@@ -185,7 +187,7 @@ function OnlineGame() {
               Rigioca
             </button>
           )}
-        </>
+        </div>
       }
     >
       <div className="space-y-3">
