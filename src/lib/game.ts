@@ -387,11 +387,17 @@ export function reservesOf(state: GameState, faction: Faction): PieceState[] {
 }
 
 // Free cells of one's own deployment zone, where captured pieces can be redeployed.
-export function legalDrops(state: GameState, faction: Faction): Axial[] {
+// A drop is only legal if it does not leave one's own king in check.
+export function legalDrops(state: GameState, faction: Faction, pieceState?: PieceState): Axial[] {
   if (state.winner) return [];
   if (state.turn !== faction) return [];
-  if (reservesOf(state, faction).length === 0) return [];
-  return allCells().filter((c) => deploymentZone(c) === faction && !state.pieces[key(c)]);
+  const reserve = reservesOf(state, faction);
+  if (reserve.length === 0) return [];
+  const states = pieceState ? [pieceState] : Array.from(new Set(reserve));
+  return allCells().filter((c) => {
+    if (deploymentZone(c) !== faction || state.pieces[key(c)]) return false;
+    return states.some((s) => !isInCheck(simulateDrop(state, faction, s, c), faction));
+  });
 }
 
 export function applyDrop(
@@ -404,7 +410,7 @@ export function applyDrop(
   const reserve = reservesOf(state, faction);
   const idx = reserve.indexOf(pieceState);
   if (idx === -1) return null;
-  if (!legalDrops(state, faction).some((c) => c.q === to.q && c.r === to.r)) return null;
+  if (!legalDrops(state, faction, pieceState).some((c) => c.q === to.q && c.r === to.r)) return null;
 
   const newReserves: Record<Faction, PieceState[]> = {
     yellow: [...reservesOf(state, "yellow")],
@@ -421,15 +427,27 @@ export function applyDrop(
     kind: "pawn",
   };
 
-  return {
+  const opponent = otherFaction(faction);
+  const nextBase: GameState = {
     pieces: newPieces,
     reserves: newReserves,
-    turn: otherFaction(faction),
+    turn: opponent,
     winner: null,
     moves: state.moves + 1,
-    history: [...(state.history ?? []), `${pieceState}*${cellName(to)}`],
+    history: state.history ?? [],
   };
+  let suffix = "";
+  if (isInCheck(nextBase, opponent)) {
+    if (!hasAnyLegalAction(nextBase, opponent)) {
+      nextBase.winner = faction;
+      suffix = "#";
+    } else {
+      suffix = "+";
+    }
+  }
+  return { ...nextBase, history: [...(state.history ?? []), `${pieceState}*${cellName(to)}${suffix}`] };
 }
+
 
 export function piecesOf(state: GameState, faction: Faction): Piece[] {
   return Object.values(state.pieces).filter((p) => p.owner === faction);
