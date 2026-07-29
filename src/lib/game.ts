@@ -183,28 +183,15 @@ function pseudoMoves(state: GameState, from: Axial, includeKingThreats = false):
           ? ["M", "T"]
           : [nextState(piece.state, step)!];
 
-      if (fromInCombat && targetZone !== null) {
-        // Non si può mai rientrare nel proprio schieramento.
-        if (targetZone === piece.owner) continue;
-
-        const targetIsEnemyKing =
-          occupant?.owner !== piece.owner &&
-          occupant?.kind === "king";
-
-        if (targetIsEnemyKing) {
-          arrivingCandidates = arrivingCandidates.filter(
-            (s) => s === occupant.state,
-          );
-        } else {
-          arrivingCandidates = arrivingCandidates.filter((s) =>
-            threatensEnemyKing(state, piece, target, s),
-          );
-        }
-
-        if (arrivingCandidates.length === 0) continue;
+      //Una pedina uscita dagli schieramenti non può fisicamente entrare in nessuna zona di schieramento.
+      //Durante il calcolo dello scacco, però, permettiamo di generare la minaccia teorica verso un re che si trova lì.
+      if (
+        fromInCombat &&
+        targetZone !== null &&
+        !includeKingThreats
+      ) {
+        continue;
       }
-
-
 
       if (occupant) {
         if (occupant.owner === piece.owner) continue;
