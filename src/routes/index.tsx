@@ -90,7 +90,12 @@ function Home() {
             <p className="font-serif text-xl">In sviluppo</p>
             <p className="mt-2 text-sm text-muted-foreground">
               Autore: Andrea Ciarma.
-			  Progetto INFN GAME <a href="https://web.infn.it/game/">Sito Web del Progetto</a>
+			  Progetto INFN GAME 
+			  <a href="https://web.infn.it/game/"
+				target="_blank"
+  				rel="noopener noreferrer"
+  				className="text-blue-600 hover:underline font-semibold"
+			  >Sito Web del Progetto</a>
 	      
             </p>
           </div>
