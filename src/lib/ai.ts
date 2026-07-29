@@ -28,11 +28,11 @@ function allMoves(state: GameState, faction: Faction): Move[] {
       }
     }
   }
-  const drops = legalDrops(state, faction);
   const uniqueReserve = Array.from(new Set(reservesOf(state, faction)));
   for (const d of uniqueReserve) {
-    for (const to of drops) moves.push({ kind: "drop", drop: d, to });
+    for (const to of legalDrops(state, faction, d)) moves.push({ kind: "drop", drop: d, to });
   }
+
   return moves;
 }
 
