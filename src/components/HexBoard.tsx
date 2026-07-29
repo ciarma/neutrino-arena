@@ -127,24 +127,39 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
                 : "oklch(0.99 0.005 100)";
 
           const steps = selected && isTarget ? (distance(selected, cell) as 1 | 2) : null;
+          const isCheckedKing = checkedKingKey === k;
 
           return (
             <g key={k} onClick={() => handleCellClick(cell)} style={{ cursor: disabled ? "default" : "pointer" }}>
               <polygon
                 points={hexCorners(cx, cy, HEX_SIZE - 1)}
-                fill={fill}
+                fill={isCheckedKing ? "oklch(0.88 0.13 25)" : fill}
                 stroke={
-                  isSelected
-                    ? "oklch(0.55 0.22 300)"
-                    : isDropTarget
-                      ? "oklch(0.62 0.2 150)"
-                      : "oklch(0.65 0.02 90 / 0.55)"
+                  isCheckedKing
+                    ? "oklch(0.58 0.24 25)"
+                    : isSelected
+                      ? "oklch(0.55 0.22 300)"
+                      : isDropTarget
+                        ? "oklch(0.62 0.2 150)"
+                        : "oklch(0.65 0.02 90 / 0.55)"
                 }
-                strokeWidth={isSelected || isDropTarget ? 3 : 1}
+                strokeWidth={isCheckedKing || isSelected || isDropTarget ? 3 : 1}
               />
+              {isCheckedKing && (
+                <polygon
+                  points={hexCorners(cx, cy, HEX_SIZE - 4)}
+                  fill="none"
+                  stroke="oklch(0.58 0.24 25)"
+                  strokeWidth={2}
+                  strokeDasharray="5 3"
+                >
+                  <animate attributeName="opacity" values="1;0.25;1" dur="1.2s" repeatCount="indefinite" />
+                </polygon>
+              )}
               {isDropTarget && (
                 <circle cx={cx} cy={cy} r={HEX_SIZE * 0.3} fill="oklch(0.62 0.2 150 / 0.3)" />
               )}
+
               {isTarget && !isCapture && (
                 <circle cx={cx} cy={cy} r={HEX_SIZE * 0.28} fill="oklch(0.55 0.22 300 / 0.35)" />
               )}
