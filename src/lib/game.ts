@@ -122,7 +122,7 @@ function threatensEnemyKing(
   pos: Axial,
   arriving: PieceState,
 ): boolean {
-  if (mover.kind === "king") return false; // kings cannot capture
+  //if (mover.kind === "king") return false; // kings cannot capture
   const enemy = otherFaction(mover.owner);
   const king = Object.values(gs.pieces).find((p) => p.kind === "king" && p.owner === enemy);
   if (!king) return false;
@@ -145,7 +145,7 @@ export type PseudoMove = { to: Axial; arriving: PieceState };
 
 // All geometrically/zone-legal moves for a piece, ignoring turn order and
 // ignoring whether the move leaves one's own king in check.
-function pseudoMoves(state: GameState, from: Axial): PseudoMove[] {
+function pseudoMoves(state: GameState, from: Axial, includeKingThreats = false): PseudoMove[] {
   const piece = state.pieces[key(from)];
   if (!piece) return [];
 
@@ -172,13 +172,26 @@ function pseudoMoves(state: GameState, from: Axial): PseudoMove[] {
         if (arrivingCandidates.length === 0) continue;
       }
 
+      //const occupant = state.pieces[key(target)];
+      //if (occupant) {
+      //  if (occupant.owner === piece.owner) continue;
+      //  if (piece.kind === "king") continue;
+      //  arrivingCandidates = arrivingCandidates.filter((s) => s === occupant.state);
+      //  if (arrivingCandidates.length === 0) continue;
+      //}
+
       const occupant = state.pieces[key(target)];
       if (occupant) {
         if (occupant.owner === piece.owner) continue;
-        if (piece.kind === "king") continue;
-        arrivingCandidates = arrivingCandidates.filter((s) => s === occupant.state);
+        if (piece.kind === "king") {
+          if (!includeKingThreats || occupant.kind !== "king") {
+            continue;
+          }
+        }
+        arrivingCandidates = arrivingCandidates.filter((s) => s === occupant.state,);
         if (arrivingCandidates.length === 0) continue;
       }
+
       for (const s of arrivingCandidates) results.push({ to: target, arriving: s });
     }
   }
@@ -195,7 +208,7 @@ export function isInCheck(state: GameState, faction: Faction): boolean {
   if (!king) return false;
   for (const p of Object.values(state.pieces)) {
     if (p.owner === faction) continue;
-    for (const m of pseudoMoves(state, p.pos)) {
+    for (const m of pseudoMoves(state, p.pos, true)) {
       if (m.to.q === king.pos.q && m.to.r === king.pos.r) return true;
     }
   }
