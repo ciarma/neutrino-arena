@@ -347,8 +347,6 @@ export function applyMove(
   if (!kings.yellow && kings.purple) winner = "purple";
   else if (!kings.purple && kings.yellow) winner = "yellow";
 
-  const entry = formatMove(piece, from, to, arriving, captured);
-
   const newReserves: Record<Faction, PieceState[]> = {
     yellow: [...reservesOf(state, "yellow")],
     purple: [...reservesOf(state, "purple")],
@@ -357,14 +355,31 @@ export function applyMove(
     newReserves[piece.owner] = [...newReserves[piece.owner], captured.state];
   }
 
-  return {
+  const opponent = otherFaction(piece.owner);
+  const nextBase: GameState = {
     pieces: newPieces,
     reserves: newReserves,
-    turn: winner ? state.turn : otherFaction(state.turn),
+    turn: winner ? state.turn : opponent,
     winner,
     moves: state.moves + 1,
-    history: [...(state.history ?? []), entry],
+    history: state.history ?? [],
   };
+
+  let suffix = "";
+  if (!winner) {
+    if (isInCheck(nextBase, opponent)) {
+      if (!hasAnyLegalAction(nextBase, opponent)) {
+        nextBase.winner = piece.owner;
+        suffix = "#";
+      } else {
+        suffix = "+";
+      }
+    }
+  }
+
+  const entry = formatMove(piece, from, to, arriving, captured) + suffix;
+  return { ...nextBase, history: [...(state.history ?? []), entry] };
+
 }
 
 export function reservesOf(state: GameState, faction: Faction): PieceState[] {
