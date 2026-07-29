@@ -18,6 +18,7 @@ Versione webapp di Neutrino Arena, gioco astratto basato sull'oscillazione del s
 - immagini tabellone
 - immagini home
 - ~~tasto regole PDF in game~~
+- aggiusta ia: evita di muovere il re, prediligi dare scacco
 
 ---
 This project was built with [Lovable](https://lovable.dev).
