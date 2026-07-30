@@ -58,7 +58,19 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
 
         <div className="grid gap-4 lg:grid-cols-[1fr_260px]">
           <div className="rounded-3xl border border-border/60 bg-card/40 p-4 shadow-inner">{children}</div>
-          <MoveLog history={state.history ?? []} first={state.first ?? "yellow"} />
+          <MoveLog
+            history={state.history ?? []}
+            first={
+              state.first ??
+              // Fallback for states created before `first` existed: infer it from
+              // whose turn it is and how many half-moves were played.
+              ((state.history ?? []).length % 2 === 0
+                ? state.turn
+                : state.turn === "yellow"
+                  ? "purple"
+                  : "yellow")
+            }
+          />
         </div>
 
         {actions && <div className="mt-6 flex flex-wrap justify-center gap-3">{actions}</div>}
