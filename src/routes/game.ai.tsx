@@ -86,12 +86,12 @@ function AiGame() {
       }
     >
       <div className="space-y-3">
-        <ReserveTray state={state} faction={player} selected={dropState}
-          onSelect={(s) => { setDropState(s); setSelected(null); }} interactive={!thinking} />
+        <ReserveTray state={state} faction={ai} />
         <HexBoard state={state} selected={selected} onSelect={setSelected} onMove={handleMove}
           perspective={player} disabled={thinking || state.turn !== player}
           dropState={dropState} onDrop={handleDrop} />
-        <ReserveTray state={state} faction={ai} />
+        <ReserveTray state={state} faction={player} selected={dropState}
+          onSelect={(s) => { setDropState(s); setSelected(null); }} interactive={!thinking} />
       </div>
     </GameShell>
   );
