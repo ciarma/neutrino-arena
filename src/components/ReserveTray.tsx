@@ -1,4 +1,5 @@
 import { reservesOf, type Faction, type GameState, type PieceState } from "@/lib/game";
+import { pieceImage } from "@/lib/piece-images";
 
 type Props = {
   state: GameState;

@@ -11,6 +11,7 @@ import {
   type Axial,
 } from "@/lib/hex";
 import { isInCheck, legalDrops, legalMoves, legalStateChoices, type Faction, type GameState, type PieceState } from "@/lib/game";
+import { pieceImage } from "@/lib/piece-images";
 
 type Props = {
   state: GameState;
@@ -186,46 +187,18 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
               )}
               {piece && (
                 <g style={{ transform: `rotate(${-rotation}deg)`, transformOrigin: `${cx}px ${cy}px` }}>
-                  <circle cx={cx} cy={cy + 2} r={HEX_SIZE * 0.55} fill="oklch(0 0 0 / 0.25)" />
-                  <circle
-                    cx={cx}
-                    cy={cy}
-                    r={HEX_SIZE * 0.55}
-                    fill={piece.owner === "yellow" ? "url(#piece-yellow)" : "url(#piece-purple)"}
-                    stroke={
-                      piece.kind === "king"
-                        ? "oklch(0.72 0.19 55)"
-                        : piece.owner === "yellow"
-                          ? "oklch(0.45 0.12 80)"
-                          : "oklch(0.22 0.12 295)"
-                    }
-                    strokeWidth={piece.kind === "king" ? 3 : 1.5}
+                  <ellipse cx={cx} cy={cy + HEX_SIZE * 0.62} rx={HEX_SIZE * 0.45} ry={HEX_SIZE * 0.14} fill="oklch(0 0 0 / 0.2)" />
+                  <image
+                    href={pieceImage(piece.owner, piece.kind, piece.state)}
+                    x={cx - HEX_SIZE * 0.62}
+                    y={cy - HEX_SIZE * 0.62}
+                    width={HEX_SIZE * 1.24}
+                    height={HEX_SIZE * 1.24}
+                    style={{ pointerEvents: "none" }}
                   />
-                  {piece.kind === "king" && (
-                    <text
-                      x={cx}
-                      y={cy - HEX_SIZE * 0.28}
-                      fontSize={HEX_SIZE * 0.38}
-                      textAnchor="middle"
-                      fill={piece.owner === "yellow" ? "oklch(0.35 0.15 60)" : "oklch(0.95 0.1 80)"}
-                      style={{ pointerEvents: "none" }}
-                    >
-                      ♛
-                    </text>
-                  )}
-                  <text
-                    x={cx}
-                    y={cy + HEX_SIZE * 0.22}
-                    fontSize={HEX_SIZE * 0.5}
-                    fontWeight={700}
-                    textAnchor="middle"
-                    fill={piece.owner === "yellow" ? "oklch(0.28 0.08 80)" : "oklch(0.98 0.02 300)"}
-                    style={{ pointerEvents: "none", fontFamily: "ui-serif, Georgia, serif" }}
-                  >
-                    {piece.state}
-                  </text>
                 </g>
               )}
+
               {!piece && (
                 <text
                   x={cx}
