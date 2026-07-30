@@ -60,10 +60,10 @@ function LocalGame() {
       }
     >
       <div className="space-y-3">
-        <ReserveTray state={state} faction="yellow" selected={dropState} onSelect={(s) => { setDropState(s); setSelected(null); }} interactive />
+        <ReserveTray state={state} faction="purple" selected={dropState} onSelect={(s) => { setDropState(s); setSelected(null); }} interactive />
         <HexBoard state={state} selected={selected} onSelect={setSelected} onMove={handleMove}
           dropState={dropState} onDrop={handleDrop} />
-        <ReserveTray state={state} faction="purple" selected={dropState} onSelect={(s) => { setDropState(s); setSelected(null); }} interactive />
+        <ReserveTray state={state} faction="yellow" selected={dropState} onSelect={(s) => { setDropState(s); setSelected(null); }} interactive />
       </div>
     </GameShell>
   );
