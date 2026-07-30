@@ -29,6 +29,8 @@ export type GameState = {
   // Captured enemy pieces held by each faction, ready to be redeployed.
   reserves: Record<Faction, PieceState[]>;
   turn: Faction;
+  // Faction that moved first in this game (needed to align the move log).
+  first?: Faction;
   winner: Faction | null;
   moves: number;
   history: string[]; // human-readable log, one entry per half-move
