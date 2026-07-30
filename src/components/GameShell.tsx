@@ -79,7 +79,7 @@ function MoveLog({ history, first = "yellow" }: { history: string[]; first?: Fac
       <h2 className="mb-3 font-serif text-sm uppercase tracking-[0.2em] text-muted-foreground">
         Registro mosse
       </h2>
-      {rows.length === 0 ? (
+      {history.length === 0 ? (
         <p className="text-xs text-muted-foreground">Nessuna mossa ancora.</p>
       ) : (
         <ol className="space-y-1 font-mono text-xs">
