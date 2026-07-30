@@ -51,7 +51,9 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
   // For E + 2 steps on an empty cell we need to ask the player M or T.
   const [pending, setPending] = useState<{ from: Axial; to: Axial; choices: PieceState[] } | null>(null);
 
-  const rotation = perspective === "purple" ? 180 : 0;
+  // Board is stored with yellow on top; flip it so the viewing faction sits at
+  // the bottom (default view: yellow below, purple above).
+  const rotation = perspective === "purple" ? 0 : 180;
 
   const handleCellClick = (cell: Axial) => {
     if (disabled) return;
