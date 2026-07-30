@@ -191,11 +191,8 @@ function OnlineGame() {
       }
     >
       <div className="space-y-3">
-        {(myFaction === "purple"
-          ? (["yellow", "purple"] as const)
-          : (["purple", "yellow"] as const)
-        ).map((f, i) => (
-          <div key={f}>
+        {([topFaction, bottomFaction] as const).map((f, i) => (
+          <div key={f} className="space-y-3">
             {i === 1 && (
               <HexBoard
                 state={state}
@@ -208,16 +205,14 @@ function OnlineGame() {
                 onDrop={handleDrop}
               />
             )}
-            <div className={i === 1 ? "mt-3" : ""}>
-              <ReserveTray
-                state={state}
-                faction={f}
-                label={myFaction === f ? "La tua riserva" : undefined}
-                selected={myFaction === f ? dropState : undefined}
-                onSelect={myFaction === f ? (s) => { setDropState(s); setSelected(null); } : undefined}
-                interactive={myFaction === f}
-              />
-            </div>
+            <ReserveTray
+              state={state}
+              faction={f}
+              label={myFaction === f ? "La tua riserva" : undefined}
+              selected={myFaction === f ? dropState : undefined}
+              onSelect={myFaction === f ? (s: PieceState) => { setDropState(s); setSelected(null); } : undefined}
+              interactive={myFaction === f}
+            />
           </div>
         ))}
       </div>
