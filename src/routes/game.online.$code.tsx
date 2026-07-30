@@ -152,6 +152,9 @@ function OnlineGame() {
     );
   }
 
+  const bottomFaction: Faction = myFaction === "purple" ? "purple" : "yellow";
+  const topFaction: Faction = bottomFaction === "yellow" ? "purple" : "yellow";
+
   const waiting = row && !row.purple_player;
   const status = waiting
     ? "In attesa del secondo giocatore…"
@@ -210,7 +213,7 @@ function OnlineGame() {
               faction={f}
               label={myFaction === f ? "La tua riserva" : undefined}
               selected={myFaction === f ? dropState : undefined}
-              onSelect={myFaction === f ? (s: PieceState) => { setDropState(s); setSelected(null); } : undefined}
+              onSelect={myFaction === f ? (s: PieceState | null) => { setDropState(s); setSelected(null); } : undefined}
               interactive={myFaction === f}
             />
           </div>
