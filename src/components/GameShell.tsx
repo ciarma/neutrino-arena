@@ -67,10 +67,12 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
   );
 }
 
-function MoveLog({ history }: { history: string[] }) {
+function MoveLog({ history, first = "yellow" }: { history: string[]; first?: Faction }) {
   const rows: Array<{ n: number; y?: string; p?: string }> = [];
-  for (let i = 0; i < history.length; i += 2) {
-    rows.push({ n: i / 2 + 1, y: history[i], p: history[i + 1] });
+  // If purple moved first, shift the log by one half-move so columns stay aligned.
+  const entries: Array<string | undefined> = first === "purple" ? [undefined, ...history] : [...history];
+  for (let i = 0; i < entries.length; i += 2) {
+    rows.push({ n: i / 2 + 1, y: entries[i], p: entries[i + 1] });
   }
   return (
     <aside className="rounded-3xl border border-border/60 bg-card/40 p-4 shadow-inner lg:sticky lg:top-4 lg:max-h-[70vh] lg:overflow-auto">
