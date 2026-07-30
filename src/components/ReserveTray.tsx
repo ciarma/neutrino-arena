@@ -33,20 +33,17 @@ export function ReserveTray({ state, faction, label, selected = null, onSelect, 
                 disabled={!canAct}
                 onClick={() => onSelect?.(isSelected ? null : s)}
                 title={canAct ? "Schiera questa pedina in una cella libera del tuo schieramento" : undefined}
-                className={`flex h-8 w-8 items-center justify-center rounded-full border text-sm font-semibold transition ${
+                className={`flex h-9 w-9 items-center justify-center rounded-full transition ${
                   isSelected ? "ring-2 ring-offset-1 ring-offset-background ring-primary" : ""
                 } ${canAct ? "cursor-pointer hover:opacity-90" : "cursor-default opacity-80"}`}
-                style={{
-                  background:
-                    faction === "yellow"
-                      ? "radial-gradient(circle at 30% 30%, oklch(0.95 0.15 95), oklch(0.7 0.16 85))"
-                      : "radial-gradient(circle at 30% 30%, oklch(0.72 0.18 310), oklch(0.35 0.18 295))",
-                  color: faction === "yellow" ? "oklch(0.28 0.08 80)" : "oklch(0.98 0.02 300)",
-                  borderColor: faction === "yellow" ? "oklch(0.45 0.12 80)" : "oklch(0.22 0.12 295)",
-                }}
               >
-                {s}
+                <img
+                  src={pieceImage(faction, "pawn", s)}
+                  alt={`Pedina ${faction === "yellow" ? "gialla" : "viola"} stato ${s}`}
+                  className="h-full w-full object-contain"
+                />
               </button>
+
             );
           })}
         </div>
