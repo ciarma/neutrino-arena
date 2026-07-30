@@ -152,6 +152,9 @@ function OnlineGame() {
     );
   }
 
+  const bottomFaction: Faction = myFaction === "purple" ? "purple" : "yellow";
+  const topFaction: Faction = bottomFaction === "yellow" ? "purple" : "yellow";
+
   const waiting = row && !row.purple_player;
   const status = waiting
     ? "In attesa del secondo giocatore…"
@@ -191,32 +194,30 @@ function OnlineGame() {
       }
     >
       <div className="space-y-3">
-        <ReserveTray
-          state={state}
-          faction="yellow"
-          label={myFaction === "yellow" ? "La tua riserva" : undefined}
-          selected={myFaction === "yellow" ? dropState : undefined}
-          onSelect={myFaction === "yellow" ? (s) => { setDropState(s); setSelected(null); } : undefined}
-          interactive={myFaction === "yellow"}
-        />
-        <HexBoard
-          state={state}
-          selected={selected}
-          onSelect={setSelected}
-          onMove={handleMove}
-          perspective={myFaction ?? "yellow"}
-          disabled={disabled}
-          dropState={dropState}
-          onDrop={handleDrop}
-        />
-        <ReserveTray
-          state={state}
-          faction="purple"
-          label={myFaction === "purple" ? "La tua riserva" : undefined}
-          selected={myFaction === "purple" ? dropState : undefined}
-          onSelect={myFaction === "purple" ? (s) => { setDropState(s); setSelected(null); } : undefined}
-          interactive={myFaction === "purple"}
-        />
+        {([topFaction, bottomFaction] as const).map((f, i) => (
+          <div key={f} className="space-y-3">
+            {i === 1 && (
+              <HexBoard
+                state={state}
+                selected={selected}
+                onSelect={setSelected}
+                onMove={handleMove}
+                perspective={myFaction ?? "yellow"}
+                disabled={disabled}
+                dropState={dropState}
+                onDrop={handleDrop}
+              />
+            )}
+            <ReserveTray
+              state={state}
+              faction={f}
+              label={myFaction === f ? "La tua riserva" : undefined}
+              selected={myFaction === f ? dropState : undefined}
+              onSelect={myFaction === f ? (s: PieceState | null) => { setDropState(s); setSelected(null); } : undefined}
+              interactive={myFaction === f}
+            />
+          </div>
+        ))}
       </div>
     </GameShell>
   );
