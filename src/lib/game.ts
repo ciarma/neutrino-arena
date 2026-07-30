@@ -29,6 +29,8 @@ export type GameState = {
   // Captured enemy pieces held by each faction, ready to be redeployed.
   reserves: Record<Faction, PieceState[]>;
   turn: Faction;
+  // Faction that moved first in this game (needed to align the move log).
+  first?: Faction;
   winner: Faction | null;
   moves: number;
   history: string[]; // human-readable log, one entry per half-move
@@ -97,10 +99,13 @@ export function initialState(): GameState {
     { d: DIAMOND_ROWS - 3, state: "E" },
   ]);
 
+  const first: Faction = Math.random() < 0.5 ? "yellow" : "purple";
+
   return {
     pieces,
     reserves: { yellow: [], purple: [] },
-    turn: "yellow",
+    turn: first,
+    first,
     winner: null,
     moves: 0,
     history: [],

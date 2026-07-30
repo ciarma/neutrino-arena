@@ -58,7 +58,7 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
 
         <div className="grid gap-4 lg:grid-cols-[1fr_260px]">
           <div className="rounded-3xl border border-border/60 bg-card/40 p-4 shadow-inner">{children}</div>
-          <MoveLog history={state.history ?? []} />
+          <MoveLog history={state.history ?? []} first={state.first ?? "yellow"} />
         </div>
 
         {actions && <div className="mt-6 flex flex-wrap justify-center gap-3">{actions}</div>}
@@ -67,17 +67,19 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
   );
 }
 
-function MoveLog({ history }: { history: string[] }) {
+function MoveLog({ history, first = "yellow" }: { history: string[]; first?: Faction }) {
   const rows: Array<{ n: number; y?: string; p?: string }> = [];
-  for (let i = 0; i < history.length; i += 2) {
-    rows.push({ n: i / 2 + 1, y: history[i], p: history[i + 1] });
+  // If purple moved first, shift the log by one half-move so columns stay aligned.
+  const entries: Array<string | undefined> = first === "purple" ? [undefined, ...history] : [...history];
+  for (let i = 0; i < entries.length; i += 2) {
+    rows.push({ n: i / 2 + 1, y: entries[i], p: entries[i + 1] });
   }
   return (
     <aside className="rounded-3xl border border-border/60 bg-card/40 p-4 shadow-inner lg:sticky lg:top-4 lg:max-h-[70vh] lg:overflow-auto">
       <h2 className="mb-3 font-serif text-sm uppercase tracking-[0.2em] text-muted-foreground">
         Registro mosse
       </h2>
-      {rows.length === 0 ? (
+      {history.length === 0 ? (
         <p className="text-xs text-muted-foreground">Nessuna mossa ancora.</p>
       ) : (
         <ol className="space-y-1 font-mono text-xs">
