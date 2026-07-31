@@ -90,18 +90,18 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
   };
 
   return (
-    <div className="relative">
+    <div className="relative mx-auto max-w-[560px] overflow-hidden rounded-2xl">
       <img
         src="/board-bg.png"
         alt=""
-        className="absolute inset-0 z-0 h-full w-full rounded-2xl object-cover"
+        className="absolute inset-0 z-0 h-full w-full object-cover"
         loading="lazy"
         width={560}
         height={907}
       />
       <svg
         viewBox={`0 0 ${bounds.width} ${bounds.height}`}
-        className="relative z-10 w-full h-auto max-w-[560px] mx-auto"
+        className="relative z-10 h-auto w-full"
         style={{ transform: `rotate(${rotation}deg)` }}
         role="img"
         aria-label="Plancia esagonale"
