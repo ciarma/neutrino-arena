@@ -34,6 +34,7 @@ function OnlineGame() {
   const { code } = Route.useParams();
   const playerId = useMemo(() => getOrCreatePlayerId(), []);
   const [row, setRow] = useState<Row | null>(null);
+  const [past, setPast] = useState<GameState[]>([]);
   const [selected, setSelected] = useState<Axial | null>(null);
   const [dropState, setDropState] = useState<PieceState | null>(null);
   const [error, setError] = useState<string | null>(null);
