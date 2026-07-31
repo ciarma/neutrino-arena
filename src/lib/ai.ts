@@ -80,9 +80,27 @@ function minimax(state: GameState, depth: number, ai: Faction, alpha: number, be
   }
 }
 
-export function chooseAiMove(state: GameState, ai: Faction, depth = 2): Move | null {
+export type Difficulty = "easy" | "hard";
+
+export function chooseAiMove(
+  state: GameState,
+  ai: Faction,
+  depth = 2,
+  difficulty: Difficulty = "hard",
+): Move | null {
   const moves = allMoves(state, ai);
   if (moves.length === 0) return null;
+
+  // Easy mode: 55% of the time play a random legal move, and search shallower.
+  if (difficulty === "easy") {
+    if (Math.random() < 0.55) {
+      const playable = moves.filter((m) => applyAiMove(state, ai, m));
+      const pool = playable.length ? playable : moves;
+      return pool[Math.floor(Math.random() * pool.length)] ?? null;
+    }
+    depth = 1;
+  }
+
   let bestScore = -Infinity;
   let best: Move[] = [];
   for (const m of moves) {

@@ -56,7 +56,7 @@ export function needsStateChoice(piece: Piece, steps: 1 | 2): boolean {
   return piece.state === "E" && steps === 2;
 }
 
-export function initialState(): GameState {
+export function initialState(firstFaction?: Faction): GameState {
   const pieces: Record<string, Piece> = {};
   let idCounter = 0;
 
@@ -99,7 +99,7 @@ export function initialState(): GameState {
     { d: DIAMOND_ROWS - 3, state: "E" },
   ]);
 
-  const first: Faction = Math.random() < 0.5 ? "yellow" : "purple";
+  const first: Faction = firstFaction ?? (Math.random() < 0.5 ? "yellow" : "purple");
 
   return {
     pieces,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { GameShell } from "@/components/GameShell";
 import { HexBoard } from "@/components/HexBoard";
@@ -22,10 +22,16 @@ export const Route = createFileRoute("/game/local")({
 });
 
 function LocalGame() {
-  const [state, setState] = useState(initialState());
+  // Deterministic on the server to avoid hydration mismatches; the real
+  // random first player is drawn on the client after mount.
+  const [state, setState] = useState(() => initialState("yellow"));
   const [past, setPast] = useState<ReturnType<typeof initialState>[]>([]);
   const [selected, setSelected] = useState<Axial | null>(null);
   const [dropState, setDropState] = useState<PieceState | null>(null);
+
+  useEffect(() => {
+    setState(initialState());
+  }, []);
 
   const handleMove = (from: Axial, to: Axial, chosen?: "M" | "T") => {
     const next = applyMove(state, from, to, chosen);
