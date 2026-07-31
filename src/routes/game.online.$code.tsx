@@ -201,6 +201,15 @@ function OnlineGame() {
           >
             {copied ? "Codice copiato!" : `Copia codice ${code}`}
           </button>
+          {myFaction && (
+            <button
+              onClick={undo}
+              disabled={past.length === 0}
+              className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition disabled:opacity-40 disabled:pointer-events-none"
+            >
+              Annulla
+            </button>
+          )}
           {state.winner && myFaction && (
             <button
               onClick={reset}
