@@ -102,10 +102,16 @@ function AiGame() {
       : `Tocca a te (giallo)`;
 
   return (
-    <GameShell title="Contro l'IA" subtitle="Sei il giallo" state={state} perspective={player} status={status}
+    <GameShell title="Contro l'IA" subtitle={`Sei il giallo · difficoltà ${difficulty === "easy" ? "facile" : "difficile"}`} state={state} perspective={player} status={status}
       actions={
 	<div className="flex items-center gap-3">
 	<PdfViewerModal />
+        <button
+          onClick={() => { setDifficulty(null); setState(initialState("yellow")); setSelected(null); setDropState(null); }}
+          className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition"
+        >
+          Cambia difficoltà
+        </button>
         <button
           onClick={() => { setState(initialState()); setSelected(null); setDropState(null); }}
           className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition"
