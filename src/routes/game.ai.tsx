@@ -4,7 +4,7 @@ import { GameShell } from "@/components/GameShell";
 import { HexBoard } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type Faction, type PieceState } from "@/lib/game";
 import { ReserveTray } from "@/components/ReserveTray";
-import { applyAiMove, chooseAiMove } from "@/lib/ai";
+import { applyAiMove, chooseAiMove, type Difficulty } from "@/lib/ai";
 import type { Axial } from "@/lib/hex";
 import PdfViewerModal from "@/components/PdfViewerModal";
 
