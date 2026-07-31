@@ -102,6 +102,7 @@ function OnlineGame() {
     if (!next) return;
     setSelected(null);
     setDropState(null);
+    setPast((p) => [...p, state]);
     setRow({ ...row, state: next });
     const { error } = await supabase
       .from("games")
@@ -116,6 +117,7 @@ function OnlineGame() {
     if (!next) return;
     setSelected(null);
     setDropState(null);
+    setPast((p) => [...p, state]);
     setRow({ ...row, state: next });
     const { error } = await supabase
       .from("games")
@@ -124,13 +126,29 @@ function OnlineGame() {
     if (error) setError(error.message);
   };
 
+  const undo = async () => {
+    if (!row || past.length === 0) return;
+    const prev = past[past.length - 1];
+    setPast((p) => p.slice(0, -1));
+    setSelected(null);
+    setDropState(null);
+    setRow({ ...row, state: prev });
+    const { error } = await supabase
+      .from("games")
+      .update({ state: prev as never, updated_at: new Date().toISOString() })
+      .eq("code", code);
+    if (error) setError(error.message);
+  };
+
   const reset = async () => {
     if (!row) return;
     const fresh = initialState();
+    setPast([]);
     setRow({ ...row, state: fresh });
     setSelected(null);
     await supabase.from("games").update({ state: fresh as never }).eq("code", code);
   };
+
 
   const shareCode = async () => {
     try {
