@@ -99,7 +99,7 @@ export function initialState(): GameState {
     { d: DIAMOND_ROWS - 3, state: "E" },
   ]);
 
-  const first: Faction = Math.random() < 0.5 ? "yellow" : "purple";
+  const first: Faction = firstFaction ?? (Math.random() < 0.5 ? "yellow" : "purple");
 
   return {
     pieces,
