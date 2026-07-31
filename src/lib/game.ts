@@ -56,7 +56,7 @@ export function needsStateChoice(piece: Piece, steps: 1 | 2): boolean {
   return piece.state === "E" && steps === 2;
 }
 
-export function initialState(): GameState {
+export function initialState(firstFaction?: Faction): GameState {
   const pieces: Record<string, Piece> = {};
   let idCounter = 0;
 
