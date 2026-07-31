@@ -23,12 +23,14 @@ export const Route = createFileRoute("/game/local")({
 
 function LocalGame() {
   const [state, setState] = useState(initialState());
+  const [past, setPast] = useState<ReturnType<typeof initialState>[]>([]);
   const [selected, setSelected] = useState<Axial | null>(null);
   const [dropState, setDropState] = useState<PieceState | null>(null);
 
   const handleMove = (from: Axial, to: Axial, chosen?: "M" | "T") => {
     const next = applyMove(state, from, to, chosen);
     if (next) {
+      setPast((p) => [...p, state]);
       setState(next);
       setSelected(null);
       setDropState(null);
@@ -39,10 +41,21 @@ function LocalGame() {
     if (!dropState) return;
     const next = applyDrop(state, state.turn, dropState, to);
     if (next) {
+      setPast((p) => [...p, state]);
       setState(next);
       setSelected(null);
       setDropState(null);
     }
+  };
+
+  const undo = () => {
+    setPast((p) => {
+      if (p.length === 0) return p;
+      setState(p[p.length - 1]);
+      setSelected(null);
+      setDropState(null);
+      return p.slice(0, -1);
+    });
   };
 
   return (
@@ -51,7 +64,14 @@ function LocalGame() {
 	<div className="flex items-center gap-3">
 	<PdfViewerModal />
         <button
-          onClick={() => { setState(initialState()); setSelected(null); setDropState(null); }}
+          onClick={undo}
+          disabled={past.length === 0}
+          className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition disabled:opacity-40 disabled:pointer-events-none"
+        >
+          Annulla
+        </button>
+        <button
+          onClick={() => { setState(initialState()); setPast([]); setSelected(null); setDropState(null); }}
           className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition"
         >
           Nuova partita
