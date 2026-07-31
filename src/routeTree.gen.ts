@@ -9,31 +9,31 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as GameLocalRouteImport } from './routes/game.local'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as GameAiRouteImport } from './routes/game.ai'
+import { Route as GameLocalRouteImport } from './routes/game.local'
 import { Route as GameOnlineIndexRouteImport } from './routes/game.online.index'
 import { Route as GameOnlineCodeRouteImport } from './routes/game.online.$code'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GameLocalRoute = GameLocalRouteImport.update({
-  id: '/game/local',
-  path: '/game/local',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GameAiRoute = GameAiRouteImport.update({
   id: '/game/ai',
   path: '/game/ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GameLocalRoute = GameLocalRouteImport.update({
+  id: '/game/local',
+  path: '/game/local',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GameOnlineIndexRoute = GameOnlineIndexRouteImport.update({
@@ -110,13 +110,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -124,11 +117,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/game/local': {
-      id: '/game/local'
-      path: '/game/local'
-      fullPath: '/game/local'
-      preLoaderRoute: typeof GameLocalRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/game/ai': {
@@ -136,6 +129,13 @@ declare module '@tanstack/react-router' {
       path: '/game/ai'
       fullPath: '/game/ai'
       preLoaderRoute: typeof GameAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/game/local': {
+      id: '/game/local'
+      path: '/game/local'
+      fullPath: '/game/local'
+      preLoaderRoute: typeof GameLocalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/game/online/': {
@@ -166,3 +166,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
