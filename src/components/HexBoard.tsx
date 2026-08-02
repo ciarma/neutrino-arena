@@ -5,7 +5,6 @@ import {
   boardPixelBounds,
   cellName,
   deploymentZone,
-  distance,
   hexCorners,
   key,
   type Axial,
@@ -137,7 +136,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
                 ? "oklch(0.92 0.05 305)"
                 : "oklch(0.99 0.005 100)";
 
-          const steps = selected && isTarget ? (distance(selected, cell) as 1 | 2) : null;
+          
           const isCheckedKing = checkedKingKey === k;
 
           return (
@@ -182,18 +181,6 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
                   strokeWidth={3}
                   strokeDasharray="4 3"
                 />
-              )}
-              {isTarget && steps && (
-                <text
-                  x={cx + HEX_SIZE * 0.55}
-                  y={cy - HEX_SIZE * 0.55}
-                  fontSize={HEX_SIZE * 0.35}
-                  fill="oklch(0.45 0.15 300)"
-                  textAnchor="middle"
-                  style={{ transform: `rotate(${-rotation}deg)`, transformOrigin: `${cx}px ${cy}px` }}
-                >
-                  {steps}
-                </text>
               )}
               {piece && (
                 <g style={{ transform: `rotate(${-rotation}deg)`, transformOrigin: `${cx}px ${cy}px` }}>
