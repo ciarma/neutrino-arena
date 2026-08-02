@@ -5,7 +5,8 @@ import { HexBoard } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type Faction, type PieceState } from "@/lib/game";
 import { ReserveTray } from "@/components/ReserveTray";
 import { applyAiMove, chooseAiMove, type Difficulty } from "@/lib/ai";
-import type { Axial } from "@/lib/hex";
+import { key, type Axial } from "@/lib/hex";
+import { playMoveSound } from "@/lib/sound";
 import PdfViewerModal from "@/components/PdfViewerModal";
 
 export const Route = createFileRoute("/game/ai")({
@@ -40,7 +41,7 @@ function AiGame() {
       const move = chooseAiMove(state, ai, 2, difficulty);
       if (move) {
         const next = applyAiMove(state, ai, move);
-        if (next) setState(next);
+        if (next) { playMoveSound("move"); setState(next); }
       }
       setThinking(false);
     }, 450);
@@ -79,6 +80,7 @@ function AiGame() {
     if (state.turn !== player) return;
     const next = applyMove(state, from, to, chosen);
     if (next) {
+      playMoveSound(state.pieces[key(to)] ? "capture" : "move");
       setState(next);
       setSelected(null);
       setDropState(null);
@@ -89,6 +91,7 @@ function AiGame() {
     if (!dropState || state.turn !== player) return;
     const next = applyDrop(state, player, dropState, to);
     if (next) {
+      playMoveSound("move");
       setState(next);
       setSelected(null);
       setDropState(null);

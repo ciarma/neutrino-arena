@@ -5,7 +5,8 @@ import { GameShell } from "@/components/GameShell";
 import { HexBoard } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type Faction, type GameState, type PieceState } from "@/lib/game";
 import { ReserveTray } from "@/components/ReserveTray";
-import type { Axial } from "@/lib/hex";
+import { key, type Axial } from "@/lib/hex";
+import { playMoveSound } from "@/lib/sound";
 import { getOrCreatePlayerId } from "@/lib/player-id";
 import PdfViewerModal from "@/components/PdfViewerModal";
 
@@ -76,7 +77,13 @@ function OnlineGame() {
     const channel = supabase
       .channel(`games:${code}`)
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "games", filter: `code=eq.${code}` }, (payload) => {
-        setRow(payload.new as Row);
+        const incoming = payload.new as Row;
+        setRow((prev) => {
+          const before = prev?.state?.history?.length ?? 0;
+          const after = incoming.state?.history?.length ?? 0;
+          if (after > before) playMoveSound("move");
+          return incoming;
+        });
       })
       .subscribe();
     return () => {
@@ -100,6 +107,7 @@ function OnlineGame() {
     if (state.turn !== myFaction) return;
     const next = applyMove(state, from, to, chosen);
     if (!next) return;
+    playMoveSound(state.pieces[key(to)] ? "capture" : "move");
     setSelected(null);
     setDropState(null);
     setPast((p) => [...p, state]);
@@ -115,6 +123,7 @@ function OnlineGame() {
     if (!row || !myFaction || !dropState) return;
     const next = applyDrop(state, myFaction, dropState, to);
     if (!next) return;
+    playMoveSound("move");
     setSelected(null);
     setDropState(null);
     setPast((p) => [...p, state]);

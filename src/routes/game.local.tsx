@@ -4,7 +4,8 @@ import { GameShell } from "@/components/GameShell";
 import { HexBoard } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type PieceState } from "@/lib/game";
 import { ReserveTray } from "@/components/ReserveTray";
-import type { Axial } from "@/lib/hex";
+import { key, type Axial } from "@/lib/hex";
+import { playMoveSound } from "@/lib/sound";
 import PdfViewerModal from "@/components/PdfViewerModal";
 
 export const Route = createFileRoute("/game/local")({
@@ -36,6 +37,7 @@ function LocalGame() {
   const handleMove = (from: Axial, to: Axial, chosen?: "M" | "T") => {
     const next = applyMove(state, from, to, chosen);
     if (next) {
+      playMoveSound(state.pieces[key(to)] ? "capture" : "move");
       setPast((p) => [...p, state]);
       setState(next);
       setSelected(null);
@@ -47,6 +49,7 @@ function LocalGame() {
     if (!dropState) return;
     const next = applyDrop(state, state.turn, dropState, to);
     if (next) {
+      playMoveSound("move");
       setPast((p) => [...p, state]);
       setState(next);
       setSelected(null);
