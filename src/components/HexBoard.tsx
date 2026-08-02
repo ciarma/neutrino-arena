@@ -11,6 +11,7 @@ import {
 } from "@/lib/hex";
 import { isInCheck, legalDrops, legalMoves, legalStateChoices, type Faction, type GameState, type PieceState } from "@/lib/game";
 import { pieceImage } from "@/lib/piece-images";
+import { useI18n } from "@/lib/i18n";
 
 type Props = {
   state: GameState;
@@ -103,7 +104,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
         className="relative z-10 h-auto w-full"
         style={{ transform: `rotate(${rotation}deg)` }}
         role="img"
-        aria-label="Plancia esagonale"
+        aria-label={t("board.aria")}
       >
         <defs>
           <radialGradient id="piece-yellow" cx="35%" cy="30%" r="70%">
@@ -222,7 +223,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-sm">
           <div className="rounded-2xl border border-border bg-card p-5 shadow-lg text-center max-w-xs">
             <p className="mb-4 text-sm">
-              Scegli lo stato di arrivo della pedina (mossa di 2 passi da <strong>E</strong>).
+              {t("board.chooseState")} <strong>E</strong>).
             </p>
             <div className="flex justify-center gap-3">
               {(["M", "T"] as const)
@@ -240,7 +241,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
                 onClick={() => setPending(null)}
                 className="rounded-full border border-border px-5 py-2 text-sm font-medium hover:bg-accent transition"
               >
-                Annulla
+                {t("common.cancel")}
               </button>
             </div>
           </div>
