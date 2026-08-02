@@ -37,6 +37,7 @@ function LocalGame() {
   const handleMove = (from: Axial, to: Axial, chosen?: "M" | "T") => {
     const next = applyMove(state, from, to, chosen);
     if (next) {
+      playMoveSound(state.pieces[key(to)] ? "capture" : "move");
       setPast((p) => [...p, state]);
       setState(next);
       setSelected(null);
@@ -48,6 +49,7 @@ function LocalGame() {
     if (!dropState) return;
     const next = applyDrop(state, state.turn, dropState, to);
     if (next) {
+      playMoveSound("move");
       setPast((p) => [...p, state]);
       setState(next);
       setSelected(null);
