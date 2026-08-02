@@ -5,7 +5,8 @@ import { HexBoard } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type Faction, type PieceState } from "@/lib/game";
 import { ReserveTray } from "@/components/ReserveTray";
 import { applyAiMove, chooseAiMove, type Difficulty } from "@/lib/ai";
-import type { Axial } from "@/lib/hex";
+import { key, type Axial } from "@/lib/hex";
+import { playMoveSound } from "@/lib/sound";
 import PdfViewerModal from "@/components/PdfViewerModal";
 
 export const Route = createFileRoute("/game/ai")({
