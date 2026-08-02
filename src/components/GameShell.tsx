@@ -25,9 +25,12 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
           <Link to="/" className="font-serif text-lg tracking-tight text-foreground hover:text-primary transition">
             ← Neutrino Arena
           </Link>
-          <div className="text-right">
-            <h1 className="font-serif text-xl leading-tight">{title}</h1>
-            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <h1 className="font-serif text-xl leading-tight">{title}</h1>
+              {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+            </div>
+            <SoundToggle />
           </div>
         </div>
       </header>
