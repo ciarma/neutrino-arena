@@ -107,6 +107,7 @@ function OnlineGame() {
     if (state.turn !== myFaction) return;
     const next = applyMove(state, from, to, chosen);
     if (!next) return;
+    playMoveSound(state.pieces[key(to)] ? "capture" : "move");
     setSelected(null);
     setDropState(null);
     setPast((p) => [...p, state]);
@@ -122,6 +123,7 @@ function OnlineGame() {
     if (!row || !myFaction || !dropState) return;
     const next = applyDrop(state, myFaction, dropState, to);
     if (!next) return;
+    playMoveSound("move");
     setSelected(null);
     setDropState(null);
     setPast((p) => [...p, state]);
