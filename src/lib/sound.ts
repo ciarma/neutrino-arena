@@ -1,5 +1,20 @@
 // Simple synthesized "click/thud" sound for piece moves (no audio assets needed).
 let ctx: AudioContext | null = null;
+let soundEnabled = true;
+let preferenceLoaded = false;
+
+function loadPreference() {
+  if (typeof window === "undefined") return;
+  if (preferenceLoaded) return;
+  const stored = localStorage.getItem("neutrino-sound");
+  if (stored !== null) soundEnabled = stored === "true";
+  preferenceLoaded = true;
+}
+
+function savePreference() {
+  if (typeof window === "undefined") return;
+  localStorage.setItem("neutrino-sound", String(soundEnabled));
+}
 
 function getCtx(): AudioContext | null {
   if (typeof window === "undefined") return null;
@@ -9,7 +24,26 @@ function getCtx(): AudioContext | null {
   return ctx;
 }
 
+export function isSoundEnabled(): boolean {
+  loadPreference();
+  return soundEnabled;
+}
+
+export function setSoundEnabled(enabled: boolean) {
+  soundEnabled = enabled;
+  savePreference();
+}
+
+export function toggleSound(): boolean {
+  loadPreference();
+  soundEnabled = !soundEnabled;
+  savePreference();
+  return soundEnabled;
+}
+
 export function playMoveSound(kind: "move" | "capture" = "move") {
+  loadPreference();
+  if (!soundEnabled) return;
   const ac = getCtx();
   if (!ac) return;
   if (ac.state === "suspended") void ac.resume();
