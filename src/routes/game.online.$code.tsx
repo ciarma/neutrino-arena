@@ -77,7 +77,13 @@ function OnlineGame() {
     const channel = supabase
       .channel(`games:${code}`)
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "games", filter: `code=eq.${code}` }, (payload) => {
-        setRow(payload.new as Row);
+        const incoming = payload.new as Row;
+        setRow((prev) => {
+          const before = prev?.state?.history?.length ?? 0;
+          const after = incoming.state?.history?.length ?? 0;
+          if (after > before) playMoveSound("move");
+          return incoming;
+        });
       })
       .subscribe();
     return () => {
