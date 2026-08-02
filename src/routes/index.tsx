@@ -113,7 +113,9 @@ function ModeCard({
   to: string;
   accent: "yellow" | "purple" | "mixed";
 }) {
+  const { t } = useI18n();
   const gradient =
+
     accent === "yellow"
       ? "linear-gradient(135deg, oklch(0.95 0.12 95), oklch(0.75 0.16 85))"
       : accent === "purple"
