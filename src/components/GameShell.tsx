@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import type { Faction, GameState } from "@/lib/game";
 import { isInCheck, piecesOf } from "@/lib/game";
+import { SoundToggle } from "@/components/SoundToggle";
 
 type Props = {
   title: string;
