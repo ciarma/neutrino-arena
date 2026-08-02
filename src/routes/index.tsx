@@ -38,10 +38,10 @@ function Home() {
           <h1 className="font-serif text-5xl leading-[1.05] tracking-tight text-foreground sm:text-5xl">
             {t("home.h1a")}{" "}
             <span className="italic text-[color:var(--faction-yellow)]" style={{ textShadow: "0 1px 0 oklch(0.45 0.12 80)" }}>
-              Neutrini
+              {t("faction.yellow")}
             </span>{" "}
             e{" "}
-            <span className="italic text-[color:var(--faction-purple)]">Anti-Neutrini</span>
+            <span className="italic text-[color:var(--faction-purple)]">{t("faction.purple")}</span>
             {" "}
             {t("home.h1c")}
           </h1>
