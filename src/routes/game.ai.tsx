@@ -41,7 +41,7 @@ function AiGame() {
       const move = chooseAiMove(state, ai, 2, difficulty);
       if (move) {
         const next = applyAiMove(state, ai, move);
-        if (next) setState(next);
+        if (next) { playMoveSound("move"); setState(next); }
       }
       setThinking(false);
     }, 450);
