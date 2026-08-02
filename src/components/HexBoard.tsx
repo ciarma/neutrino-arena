@@ -5,7 +5,6 @@ import {
   boardPixelBounds,
   cellName,
   deploymentZone,
-  distance,
   hexCorners,
   key,
   type Axial,
