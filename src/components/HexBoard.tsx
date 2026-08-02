@@ -27,7 +27,9 @@ type Props = {
 const HEX_SIZE = 34;
 
 export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled, dropState = null, onDrop }: Props) {
+  const { t } = useI18n();
   const bounds = useMemo(() => boardPixelBounds(HEX_SIZE), []);
+
   const cells = useMemo(() => allCells(), []);
   const dropTargets = useMemo(() => {
     if (!dropState) return new Set<string>();
