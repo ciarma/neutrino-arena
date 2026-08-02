@@ -9,6 +9,7 @@ import { key, type Axial } from "@/lib/hex";
 import { playMoveSound } from "@/lib/sound";
 import { getOrCreatePlayerId } from "@/lib/player-id";
 import PdfViewerModal from "@/components/PdfViewerModal";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/game/online/$code")({
   head: ({ params }) => ({
@@ -33,6 +34,7 @@ type Row = {
 
 function OnlineGame() {
   const { code } = Route.useParams();
+  const { t } = useI18n();
   const playerId = useMemo(() => getOrCreatePlayerId(), []);
   const [row, setRow] = useState<Row | null>(null);
   const [past, setPast] = useState<GameState[]>([]);
@@ -52,7 +54,7 @@ function OnlineGame() {
         .maybeSingle();
       if (cancelled) return;
       if (error || !data) {
-        setError("Partita non trovata");
+        setError(t("online.notFound"));
         return;
       }
       let current = data as Row;
@@ -174,7 +176,7 @@ function OnlineGame() {
       <div className="min-h-screen flex items-center justify-center px-4 text-center">
         <div>
           <p className="text-destructive">{error}</p>
-          <Link to="/game/online" className="mt-4 inline-block text-sm underline">Torna alla lobby</Link>
+          <Link to="/game/online" className="mt-4 inline-block text-sm underline">{t("online.backToLobby")}</Link>
         </div>
       </div>
     );
@@ -185,19 +187,19 @@ function OnlineGame() {
 
   const waiting = row && !row.purple_player;
   const status = waiting
-    ? "In attesa del secondo giocatore…"
+    ? t("online.waiting")
     : !myFaction
-      ? "La partita è al completo — sei spettatore"
+      ? t("online.full")
       : state.winner
-        ? state.winner === myFaction ? "Hai vinto!" : "Hai perso"
+        ? state.winner === myFaction ? t("online.won") : t("online.lost")
         : state.turn === myFaction
-          ? "Tocca a te"
-          : "Attendi l'avversario";
+          ? t("online.yourTurn")
+          : t("online.waitOpponent");
 
   return (
     <GameShell
-      title={`Partita ${code}`}
-      subtitle={myFaction ? `Sei ${myFaction === "yellow" ? "giallo" : "viola"}` : "Spettatore"}
+      title={t("online.game", { code })}
+      subtitle={myFaction ? t("online.youAre", { faction: myFaction === "yellow" ? t("faction.yellowShort") : t("faction.purpleShort") }) : t("online.spectator")}
       state={state}
       perspective={myFaction ?? "yellow"}
       status={status}
@@ -208,7 +210,7 @@ function OnlineGame() {
             onClick={shareCode}
             className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition"
           >
-            {copied ? "Codice copiato!" : `Copia codice ${code}`}
+            {copied ? t("online.copied") : t("online.copyCode", { code })}
           </button>
           {myFaction && (
             <button
@@ -216,7 +218,7 @@ function OnlineGame() {
               disabled={past.length === 0}
               className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition disabled:opacity-40 disabled:pointer-events-none"
             >
-              Annulla
+              {t("common.undo")}
             </button>
           )}
           {state.winner && myFaction && (
@@ -224,7 +226,7 @@ function OnlineGame() {
               onClick={reset}
               className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition"
             >
-              Rigioca
+              {t("common.replay")}
             </button>
           )}
         </div>
@@ -248,7 +250,7 @@ function OnlineGame() {
             <ReserveTray
               state={state}
               faction={f}
-              label={myFaction === f ? "La tua riserva" : undefined}
+              label={myFaction === f ? t("reserve.yours") : undefined}
               selected={myFaction === f ? dropState : undefined}
               onSelect={myFaction === f ? (s: PieceState | null) => { setDropState(s); setSelected(null); } : undefined}
               interactive={myFaction === f}

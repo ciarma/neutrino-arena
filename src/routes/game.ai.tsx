@@ -8,6 +8,7 @@ import { applyAiMove, chooseAiMove, type Difficulty } from "@/lib/ai";
 import { key, type Axial } from "@/lib/hex";
 import { playMoveSound } from "@/lib/sound";
 import PdfViewerModal from "@/components/PdfViewerModal";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/game/ai")({
   head: () => ({
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/game/ai")({
 });
 
 function AiGame() {
+  const { t } = useI18n();
   const player: Faction = "yellow";
   const ai: Faction = "purple";
   const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
@@ -52,22 +54,22 @@ function AiGame() {
     return (
       <div className="min-h-screen bg-background text-foreground">
         <div className="mx-auto flex max-w-md flex-col items-center gap-6 px-4 py-24 text-center">
-          <h1 className="font-serif text-2xl">Contro l'IA</h1>
-          <p className="text-sm text-muted-foreground">Scegli la difficoltà prima di iniziare.</p>
+          <h1 className="font-serif text-2xl">{t("ai.title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("ai.chooseDifficulty")}</p>
           <div className="flex w-full flex-col gap-3">
             <button
               onClick={() => { setDifficulty("easy"); setState(initialState()); }}
               className="rounded-2xl border border-border bg-card px-5 py-4 text-left transition hover:bg-accent"
             >
-              <span className="block font-medium">Facile</span>
-              <span className="block text-xs text-muted-foreground">L'IA commette spesso mosse non ottimali.</span>
+              <span className="block font-medium">{t("ai.easy")}</span>
+              <span className="block text-xs text-muted-foreground">{t("ai.easyDesc")}</span>
             </button>
             <button
               onClick={() => { setDifficulty("hard"); setState(initialState()); }}
               className="rounded-2xl border border-border bg-card px-5 py-4 text-left transition hover:bg-accent"
             >
-              <span className="block font-medium">Difficile</span>
-              <span className="block text-xs text-muted-foreground">L'IA cerca sempre la mossa migliore.</span>
+              <span className="block font-medium">{t("ai.hard")}</span>
+              <span className="block text-xs text-muted-foreground">{t("ai.hardDesc")}</span>
             </button>
           </div>
         </div>
@@ -99,13 +101,13 @@ function AiGame() {
   };
 
   const status = state.winner
-    ? state.winner === player ? "Hai vinto!" : "Ha vinto l'IA"
+    ? state.winner === player ? t("ai.won") : t("ai.lost")
     : thinking
-      ? "L'IA sta pensando…"
-      : `Tocca a te (giallo)`;
+      ? t("ai.thinking")
+      : t("ai.yourTurn");
 
   return (
-    <GameShell title="Contro l'IA" subtitle={`Sei il giallo · difficoltà ${difficulty === "easy" ? "facile" : "difficile"}`} state={state} perspective={player} status={status}
+    <GameShell title={t("ai.title")} subtitle={t("ai.subtitle", { difficulty: difficulty === "easy" ? t("ai.easy") : t("ai.hard") })} state={state} perspective={player} status={status}
       actions={
 	<div className="flex items-center gap-3">
 	<PdfViewerModal />
@@ -113,13 +115,13 @@ function AiGame() {
           onClick={() => { setDifficulty(null); setState(initialState("yellow")); setSelected(null); setDropState(null); }}
           className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition"
         >
-          Cambia difficoltà
+          {t("ai.changeDifficulty")}
         </button>
         <button
           onClick={() => { setState(initialState()); setSelected(null); setDropState(null); }}
           className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition"
         >
-          Nuova partita
+          {t("common.newGame")}
         </button>
 	</div>
       }

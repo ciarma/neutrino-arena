@@ -3,6 +3,8 @@ import { Link } from "@tanstack/react-router";
 import type { Faction, GameState } from "@/lib/game";
 import { isInCheck, piecesOf } from "@/lib/game";
 import { SoundToggle } from "@/components/SoundToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { useI18n } from "@/lib/i18n";
 
 type Props = {
   title: string;
@@ -15,21 +17,24 @@ type Props = {
 };
 
 export function GameShell({ title, subtitle, state, perspective, status, children, actions }: Props) {
+  const { t } = useI18n();
   const yellow = piecesOf(state, "yellow").length;
   const purple = piecesOf(state, "purple").length;
+  const factionName = (f: Faction) => (f === "yellow" ? t("faction.yellow") : t("faction.purple"));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/60 bg-card/50 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <Link to="/" className="font-serif text-lg tracking-tight text-foreground hover:text-primary transition">
-            ← Neutrino Arena
+            {t("nav.back")}
           </Link>
           <div className="flex items-center gap-3">
             <div className="text-right">
               <h1 className="font-serif text-xl leading-tight">{title}</h1>
               {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
             </div>
+            <LanguageToggle />
             <SoundToggle />
           </div>
         </div>
@@ -38,7 +43,7 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
       <main className="mx-auto max-w-6xl px-4 py-6">
         {!state.winner && isInCheck(state, state.turn) && (
           <div className="mb-4 rounded-2xl border-2 border-destructive/70 bg-destructive/10 px-4 py-3 text-center text-sm font-medium text-destructive">
-            SCACCO al Re {state.turn === "yellow" ? "Neutrini" : "Anti-Neutrini"} — devi risolvere lo scacco con questa mossa.
+            {t("shell.check", { faction: factionName(state.turn) })}
           </div>
         )}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -48,10 +53,10 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
               <>
                 {state.winner ? (
                   <span className="font-medium text-foreground">
-                    Vittoria {state.winner === "yellow" ? "Neutrini" : "Anti-Neutrini"}
+                    {t("shell.win", { faction: factionName(state.winner) })}
                   </span>
                 ) : (
-                  <span>Turno {state.turn === "yellow" ? "Neutrini" : "Anti-Neutrini"} · mossa #{state.moves + 1}</span>
+                  <span>{t("shell.turn", { faction: factionName(state.turn), n: state.moves + 1 })}</span>
                 )}
               </>
             )}
@@ -84,6 +89,7 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
 }
 
 function MoveLog({ history, first = "yellow" }: { history: string[]; first?: Faction }) {
+  const { t } = useI18n();
   const rows: Array<{ n: number; y?: string; p?: string }> = [];
   // If purple moved first, shift the log by one half-move so columns stay aligned.
   const entries: Array<string | undefined> = first === "purple" ? [undefined, ...history] : [...history];
@@ -93,10 +99,10 @@ function MoveLog({ history, first = "yellow" }: { history: string[]; first?: Fac
   return (
     <aside className="rounded-3xl border border-border/60 bg-card/40 p-4 shadow-inner lg:sticky lg:top-4 lg:max-h-[70vh] lg:overflow-auto">
       <h2 className="mb-3 font-serif text-sm uppercase tracking-[0.2em] text-muted-foreground">
-        Registro mosse
+        {t("shell.moveLog")}
       </h2>
       {history.length === 0 ? (
-        <p className="text-xs text-muted-foreground">Nessuna mossa ancora.</p>
+        <p className="text-xs text-muted-foreground">{t("shell.noMoves")}</p>
       ) : (
         <ol className="space-y-1 font-mono text-xs">
           {rows.map((row) => (
@@ -125,6 +131,7 @@ function FactionBadge({
   active: boolean;
   perspective?: Faction;
 }) {
+  const { t } = useI18n();
   const isYou = perspective === faction;
   return (
     <div
@@ -146,10 +153,10 @@ function FactionBadge({
         }}
       />
       <span className="font-medium capitalize">
-        {faction === "yellow" ? "Neutrini" : "Anti-Neutrini"}
-        {isYou && <span className="ml-1 text-xs text-muted-foreground">(tu)</span>}
+        {faction === "yellow" ? t("faction.yellow") : t("faction.purple")}
+        {isYou && <span className="ml-1 text-xs text-muted-foreground">{t("shell.you")}</span>}
       </span>
-      <span className="tabular-nums text-muted-foreground">{count} pezzi</span>
+      <span className="tabular-nums text-muted-foreground">{t("shell.pieces", { n: count })}</span>
     </div>
   );
 }

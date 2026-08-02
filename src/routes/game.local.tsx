@@ -7,6 +7,7 @@ import { ReserveTray } from "@/components/ReserveTray";
 import { key, type Axial } from "@/lib/hex";
 import { playMoveSound } from "@/lib/sound";
 import PdfViewerModal from "@/components/PdfViewerModal";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/game/local")({
   head: () => ({
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/game/local")({
 function LocalGame() {
   // Deterministic on the server to avoid hydration mismatches; the real
   // random first player is drawn on the client after mount.
+  const { t } = useI18n();
   const [state, setState] = useState(() => initialState("yellow"));
   const [past, setPast] = useState<ReturnType<typeof initialState>[]>([]);
   const [selected, setSelected] = useState<Axial | null>(null);
@@ -68,7 +70,7 @@ function LocalGame() {
   };
 
   return (
-    <GameShell title="Partita locale" subtitle="Due giocatori, stesso dispositivo" state={state}
+    <GameShell title={t("local.title")} subtitle={t("local.subtitle")} state={state}
       actions={
 	<div className="flex items-center gap-3">
 	<PdfViewerModal />
@@ -77,13 +79,13 @@ function LocalGame() {
           disabled={past.length === 0}
           className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition disabled:opacity-40 disabled:pointer-events-none"
         >
-          Annulla
+          {t("common.undo")}
         </button>
         <button
           onClick={() => { setState(initialState()); setPast([]); setSelected(null); setDropState(null); }}
           className="rounded-full border border-border bg-card px-5 py-2 text-sm font-medium hover:bg-accent transition"
         >
-          Nuova partita
+          {t("common.newGame")}
         </button>
 	</div>
       }

@@ -3,6 +3,8 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { initialState } from "@/lib/game";
 import { getOrCreatePlayerId } from "@/lib/player-id";
+import { useI18n } from "@/lib/i18n";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 export const Route = createFileRoute("/game/online/")({
   head: () => ({
@@ -26,6 +28,7 @@ function randomCode() {
 }
 
 function OnlineLobby() {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [joinCode, setJoinCode] = useState("");
   const [busy, setBusy] = useState(false);
@@ -53,13 +56,13 @@ function OnlineLobby() {
     setError(null);
     const code = joinCode.trim().toUpperCase();
     if (code.length < 3) {
-      setError("Codice non valido");
+      setError(t("online.invalidCode"));
       return;
     }
     setBusy(true);
     const { data, error } = await supabase.from("games").select("code").eq("code", code).maybeSingle();
     if (error || !data) {
-      setError("Partita non trovata");
+      setError(t("online.notFound"));
       setBusy(false);
       return;
     }
@@ -69,32 +72,35 @@ function OnlineLobby() {
   return (
     <div className="min-h-screen" style={{ background: "var(--gradient-hero)" }}>
       <div className="mx-auto max-w-3xl px-6 py-16">
-        <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">← Home</Link>
+        <div className="flex items-center justify-between">
+          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">{t("nav.home")}</Link>
+          <LanguageToggle />
+        </div>
 
-        <h1 className="mt-6 font-serif text-4xl">Partita online</h1>
+        <h1 className="mt-6 font-serif text-4xl">{t("online.title")}</h1>
         <p className="mt-2 text-muted-foreground">
-          Crea una nuova partita e condividi il codice, oppure inserisci il codice ricevuto.
+          {t("online.lead")}
         </p>
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
           <div className="rounded-2xl border border-border/60 bg-card/80 p-6 backdrop-blur">
-            <h2 className="font-serif text-2xl">Crea partita</h2>
+            <h2 className="font-serif text-2xl">{t("online.create")}</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Sarai la fazione gialla. Ti daremo un codice da condividere.
+              {t("online.createDesc")}
             </p>
             <button
               onClick={createGame}
               disabled={busy}
               className="mt-6 w-full rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
             >
-              {busy ? "…" : "Crea partita"}
+              {busy ? "…" : t("online.create")}
             </button>
           </div>
 
           <div className="rounded-2xl border border-border/60 bg-card/80 p-6 backdrop-blur">
-            <h2 className="font-serif text-2xl">Unisciti</h2>
+            <h2 className="font-serif text-2xl">{t("online.join")}</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Inserisci il codice ricevuto per unirti come fazione viola.
+              {t("online.joinDesc")}
             </p>
             <input
               value={joinCode}
@@ -108,7 +114,7 @@ function OnlineLobby() {
               disabled={busy || !joinCode.trim()}
               className="mt-4 w-full rounded-full border border-border bg-card px-5 py-3 text-sm font-medium transition hover:bg-accent disabled:opacity-50"
             >
-              {busy ? "…" : "Unisciti"}
+              {busy ? "…" : t("online.join")}
             </button>
           </div>
         </div>
