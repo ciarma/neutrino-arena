@@ -79,6 +79,7 @@ function AiGame() {
     if (state.turn !== player) return;
     const next = applyMove(state, from, to, chosen);
     if (next) {
+      playMoveSound(state.pieces[key(to)] ? "capture" : "move");
       setState(next);
       setSelected(null);
       setDropState(null);
@@ -89,6 +90,7 @@ function AiGame() {
     if (!dropState || state.turn !== player) return;
     const next = applyDrop(state, player, dropState, to);
     if (next) {
+      playMoveSound("move");
       setState(next);
       setSelected(null);
       setDropState(null);
