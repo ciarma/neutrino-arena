@@ -35,7 +35,7 @@ type Row = {
 function OnlineGame() {
   const { code } = Route.useParams();
   const { t } = useI18n();
-  const playerId = useMemo(() => getOrCreatePlayerId(), []);
+  const [playerId, setPlayerId] = useState<string | null>(null);
   const [row, setRow] = useState<Row | null>(null);
   const [past, setPast] = useState<GameState[]>([]);
   const [selected, setSelected] = useState<Axial | null>(null);
@@ -43,8 +43,19 @@ function OnlineGame() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
+  // Resolve stable player id from the Supabase session.
+  useEffect(() => {
+    let cancelled = false;
+    getOrCreatePlayerId().then((id) => {
+      if (cancelled) return;
+      setPlayerId(id);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
   // Initial fetch + auto-join as purple if empty.
   useEffect(() => {
+    if (!playerId) return;
     let cancelled = false;
     (async () => {
       const { data, error } = await supabase
