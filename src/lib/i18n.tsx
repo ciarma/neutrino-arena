@@ -237,6 +237,6 @@ export function useI18n() {
 
 export function getRulesPdfPath(lang: Lang): string {
   return lang === "en"
-    ? "/NeutrinoChess_rulebook_fisico_1v2_compressed.pdf"
+    ? "/NeutrinoChess_rulebook_english_1v2_compressed.pdf"
     : "/NeutrinoChess_rulebook_fisico_1v2_compressed.pdf";
 }
