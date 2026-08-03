@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { X, FileText } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
+import { getRulesPdfPath, useI18n } from "@/lib/i18n";
 
 export default function PdfViewerModal() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -40,7 +40,7 @@ export default function PdfViewerModal() {
             </div>
 
             <iframe
-              src="/NeutrinoChess_rulebook_fisico_1v2_compressed.pdf"
+              src={getRulesPdfPath(lang)}
               title={t("rules.title")}
               className="h-full w-full"
             />
