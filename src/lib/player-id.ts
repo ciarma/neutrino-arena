@@ -1,12 +1,17 @@
-// Stable per-browser player id, saved in localStorage.
-const KEY = "rombo:player-id";
+import { supabase } from "@/integrations/supabase/client";
 
-export function getOrCreatePlayerId(): string {
-  if (typeof window === "undefined") return "server";
-  let id = localStorage.getItem(KEY);
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem(KEY, id);
+// Stable per-browser player id backed by the Supabase anonymous/auth session.
+// This aligns with RLS policies that compare auth.uid() to the player columns.
+export async function getOrCreatePlayerId(): Promise<string> {
+  const { data } = await supabase.auth.getSession();
+  if (data.session?.user?.id) return data.session.user.id;
+
+  const { data: signInData, error } = await supabase.auth.signInAnonymously();
+  if (error) {
+    throw new Error(`Unable to get player id: ${error.message}`);
   }
-  return id;
+  if (!signInData.user?.id) {
+    throw new Error("Unable to get player id after anonymous sign-in");
+  }
+  return signInData.user.id;
 }

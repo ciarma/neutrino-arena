@@ -37,7 +37,7 @@ function OnlineLobby() {
   const createGame = async () => {
     setBusy(true);
     setError(null);
-    const playerId = getOrCreatePlayerId();
+    const playerId = await getOrCreatePlayerId();
     const code = randomCode();
     const { error } = await supabase.from("games").insert({
       code,
