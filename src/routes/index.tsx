@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import PdfViewerModal from "@/components/PdfViewerModal";
-import { useI18n } from "@/lib/i18n";
+import { getRulesPdfPath, useI18n } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
 
 export const Route = createFileRoute("/")({
@@ -88,11 +88,11 @@ function Home() {
 	      
             </p>
 	    <PdfViewerModal />
-	    <a
-  		href="/NeutrinoChess_rulebook_fisico_1v2_compressed.pdf"
+      <a
+  		href={getRulesPdfPath(lang)}
   		download
   		className="text-sm font-medium hover:underline"
-	    >
+  	>
   {t("rules.download")}
 </a>
           </div>
