@@ -225,7 +225,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-sm">
           <div className="rounded-2xl border border-border bg-card p-5 shadow-lg text-center max-w-xs">
             <p className="mb-4 text-sm">
-              {t("board.chooseState")} <strong>E</strong>).
+              {t("board.chooseState")}.
             </p>
             <div className="flex justify-center gap-3">
               {(["M", "T"] as const)
