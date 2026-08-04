@@ -146,3 +146,21 @@
     color: var(--color-foreground);
   }
 }
+
+/* Bordo lampeggiante della plancia: indica il giocatore di turno */
+@keyframes turn-glow {
+  0%, 100% {
+    border-color: color-mix(in oklab, var(--turn-color) 35%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--turn-color) 0%, transparent);
+  }
+  50% {
+    border-color: var(--turn-color);
+    box-shadow: 0 0 22px 3px color-mix(in oklab, var(--turn-color) 55%, transparent);
+  }
+}
+
+.turn-border {
+  border-width: 4px;
+  border-style: solid;
+  animation: turn-glow 1.6s ease-in-out infinite;
+}
