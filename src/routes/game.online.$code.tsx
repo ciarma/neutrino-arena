@@ -6,7 +6,7 @@ import { HexBoard } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type Faction, type GameState, type PieceState } from "@/lib/game";
 import { ReserveTray } from "@/components/ReserveTray";
 import { key, type Axial } from "@/lib/hex";
-import { playMoveSound } from "@/lib/sound";
+import { playMoveSound, playVictorySound, playDefeatSound } from "@/lib/sound";
 import { getOrCreatePlayerId } from "@/lib/player-id";
 import PdfViewerModal from "@/components/PdfViewerModal";
 import { useI18n } from "@/lib/i18n";
