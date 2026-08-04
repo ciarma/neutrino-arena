@@ -51,6 +51,13 @@ function AiGame() {
     return () => clearTimeout(timeout);
   }, [state, ai, difficulty]);
 
+  useEffect(() => {
+    if (!state.winner) return;
+    if (state.winner === player) playVictorySound();
+    else playDefeatSound();
+  }, [state.winner, player]);
+
+
   if (!difficulty) {
     return (
       <div className="min-h-screen bg-background text-foreground">
