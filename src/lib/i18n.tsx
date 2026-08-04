@@ -151,6 +151,11 @@ const en: Dict = {
   "home.wip": "In development",
   "home.author": "Author: Andrea Ciarma. INFN GAME project ",
   "home.site": "Project website",
+  "footer.project": "INFN GAME",
+  "footer.author": "Andrea Ciarma",
+  "footer.version": "v0.1.0",
+  "footer.placeholder": "Here you can add the INFN logo, author and version",
+
   "local.title": "Local game",
   "local.subtitle": "Two players, same device",
   "ai.title": "Vs AI",
