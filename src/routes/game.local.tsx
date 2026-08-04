@@ -5,7 +5,7 @@ import { HexBoard } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type PieceState } from "@/lib/game";
 import { ReserveTray } from "@/components/ReserveTray";
 import { key, type Axial } from "@/lib/hex";
-import { playMoveSound } from "@/lib/sound";
+import { playMoveSound, playVictorySound } from "@/lib/sound";
 import PdfViewerModal from "@/components/PdfViewerModal";
 import { useI18n } from "@/lib/i18n";
 
@@ -35,6 +35,11 @@ function LocalGame() {
   useEffect(() => {
     setState(initialState());
   }, []);
+
+  useEffect(() => {
+    if (state.winner) playVictorySound();
+  }, [state.winner]);
+
 
   const handleMove = (from: Axial, to: Axial, chosen?: "M" | "T") => {
     const next = applyMove(state, from, to, chosen);
