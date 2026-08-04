@@ -36,6 +36,11 @@ function LocalGame() {
     setState(initialState());
   }, []);
 
+  useEffect(() => {
+    if (state.winner) playVictorySound();
+  }, [state.winner]);
+
+
   const handleMove = (from: Axial, to: Axial, chosen?: "M" | "T") => {
     const next = applyMove(state, from, to, chosen);
     if (next) {
