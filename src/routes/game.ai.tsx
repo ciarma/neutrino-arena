@@ -6,7 +6,7 @@ import { applyDrop, applyMove, initialState, type Faction, type PieceState } fro
 import { ReserveTray } from "@/components/ReserveTray";
 import { applyAiMove, chooseAiMove, type Difficulty } from "@/lib/ai";
 import { key, type Axial } from "@/lib/hex";
-import { playMoveSound } from "@/lib/sound";
+import { playMoveSound, playVictorySound, playDefeatSound } from "@/lib/sound";
 import PdfViewerModal from "@/components/PdfViewerModal";
 import { useI18n } from "@/lib/i18n";
 
