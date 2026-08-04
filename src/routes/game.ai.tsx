@@ -39,6 +39,7 @@ function AiGame() {
     if (state.winner) return;
     if (state.turn !== ai) return;
     setThinking(true);
+    const delay = 450 + Math.random() * 600; // 300–600 ms
     const timeout = setTimeout(() => {
       const move = chooseAiMove(state, ai, 2, difficulty);
       if (move) {
@@ -46,7 +47,7 @@ function AiGame() {
         if (next) { playMoveSound("move"); setState(next); }
       }
       setThinking(false);
-    }, 450);
+    }, delay);
     return () => clearTimeout(timeout);
   }, [state, ai, difficulty]);
 
