@@ -57,6 +57,11 @@ const it = {
   "home.wip": "In sviluppo",
   "home.author": "Autore: Andrea Ciarma. Progetto INFN GAME ",
   "home.site": "Sito Web del Progetto",
+  "footer.project": "INFN GAME",
+  "footer.author": "Andrea Ciarma",
+  "footer.version": "v0.1.0",
+  "footer.placeholder": "Qui potrai inserire logo INFN, autore e versione",
+
   "local.title": "Partita locale",
   "local.subtitle": "Due giocatori, stesso dispositivo",
   "ai.title": "Contro l'IA",
