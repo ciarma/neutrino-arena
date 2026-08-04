@@ -230,15 +230,27 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
             <div className="flex justify-center gap-3">
               {(["M", "T"] as const)
                 .filter((s) => pending.choices.includes(s))
-                .map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => { const p = pending; setPending(null); onMove(p.from, p.to, s); }}
-                    className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition"
-                  >
-                    {s}
-                  </button>
-                ))}
+                .map((s) => {
+                  const movingPiece = state.pieces[key(pending.from)];
+                  return (
+                    <button
+                      key={s}
+                      onClick={() => { const p = pending; setPending(null); onMove(p.from, p.to, s); }}
+                      className="flex h-14 w-14 items-center justify-center rounded-full border border-border bg-background hover:bg-accent transition"
+                      title={s}
+                    >
+                      {movingPiece ? (
+                        <img
+                          src={pieceImage(movingPiece.owner, movingPiece.kind, s)}
+                          alt={s}
+                          className="h-10 w-10 object-contain"
+                        />
+                      ) : (
+                        <span className="text-sm font-bold">{s}</span>
+                      )}
+                    </button>
+                  );
+                })}
               <button
                 onClick={() => setPending(null)}
                 className="rounded-full border border-border px-5 py-2 text-sm font-medium hover:bg-accent transition"
