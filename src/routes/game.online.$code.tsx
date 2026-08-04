@@ -115,6 +115,14 @@ function OnlineGame() {
   const state = row?.state ?? initialState();
   const disabled = !myFaction || state.turn !== myFaction || !!state.winner;
 
+  useEffect(() => {
+    if (!state.winner) return;
+    if (!myFaction) return;
+    if (state.winner === myFaction) playVictorySound();
+    else playDefeatSound();
+  }, [state.winner, myFaction]);
+
+
   const handleMove = async (from: Axial, to: Axial, chosen?: "M" | "T") => {
     if (!row || !myFaction) return;
     if (state.turn !== myFaction) return;
