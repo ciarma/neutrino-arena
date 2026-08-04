@@ -91,8 +91,14 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
     }
   };
 
+  const turnColor = state.turn === "yellow" ? "oklch(0.82 0.18 90)" : "oklch(0.55 0.22 300)";
+
   return (
-    <div className="relative mx-auto max-w-[560px] overflow-hidden rounded-2xl">
+    <div
+      className={`relative mx-auto max-w-[560px] overflow-hidden rounded-2xl ${state.winner ? "" : "turn-border"}`}
+      style={{ ["--turn-color" as string]: turnColor }}
+    >
+
       <img
         src="/board-bg.png"
         alt=""
