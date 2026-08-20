@@ -5,6 +5,8 @@ import { isInCheck, piecesOf } from "@/lib/game";
 import { SoundToggle } from "@/components/SoundToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/lib/i18n";
+import factionYellowImg from "@/assets/faction-yellow.png";
+import factionPurpleImg from "@/assets/faction-purple.png";
 
 type Props = {
   title: string;
@@ -143,14 +145,13 @@ function FactionBadge({
           : "border-border/60 bg-background/40 opacity-70"
       }`}
     >
-      <span
-        className="inline-block h-4 w-4 rounded-full"
-        style={{
-          background:
-            faction === "yellow"
-              ? "radial-gradient(circle at 30% 30%, oklch(0.95 0.15 95), oklch(0.65 0.16 85))"
-              : "radial-gradient(circle at 30% 30%, oklch(0.72 0.18 310), oklch(0.32 0.18 295))",
-        }}
+      <img
+        src={faction === "yellow" ? factionYellowImg : factionPurpleImg}
+        alt={faction === "yellow" ? t("faction.yellow") : t("faction.purple")}
+        width={16}
+        height={16}
+        loading="lazy"
+        className="inline-block h-4 w-4 rounded-full object-cover"
       />
       <span className="font-medium capitalize">
         {faction === "yellow" ? t("faction.yellow") : t("faction.purple")}
