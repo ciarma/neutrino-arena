@@ -21,6 +21,16 @@ function Home() {
   const { t, lang } = useI18n();
   return (
     <div className="min-h-screen" style={{ background: "var(--gradient-hero)" }}>
+      <div className="w-full overflow-hidden">
+        <img
+          src="/banner.png"
+          alt="Neutrino Arena"
+          width={1600}
+          height={512}
+          className="block h-auto w-full object-cover"
+          fetchPriority="high"
+        />
+      </div>
       <div className="mx-auto max-w-5xl px-6 py-16">
         <header className="mb-16 flex items-center justify-between">
           <div className="flex items-center gap-2 font-serif text-lg tracking-wide">
