@@ -5,6 +5,8 @@ import { isInCheck, piecesOf } from "@/lib/game";
 import { SoundToggle } from "@/components/SoundToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/lib/i18n";
+import factionYellowImg from "@/assets/faction-yellow.png";
+import factionPurpleImg from "@/assets/faction-purple.png";
 
 type Props = {
   title: string;
