@@ -35,7 +35,7 @@ export const MOVE_ANIM_SECONDS_PER_CELL = 0.15;
 // Slides the piece from its previous cell to the new one.
 function SlideIn({ dx, dy, duration, children }: { dx: number; dy: number; duration: number; children: React.ReactNode }) {
   const [offset, setOffset] = useState({ dx, dy });
-  useEffect(() => {
+  useLayoutEffect(() => {
     const raf = requestAnimationFrame(() => setOffset({ dx: 0, dy: 0 }));
     return () => cancelAnimationFrame(raf);
   }, []);
@@ -43,13 +43,15 @@ function SlideIn({ dx, dy, duration, children }: { dx: number; dy: number; durat
     <g
       style={{
         transform: `translate(${offset.dx}px, ${offset.dy}px)`,
-        transition: `transform ${duration}s cubic-bezier(0.22, 0.61, 0.36, 1)`,
+        transition: offset.dx === 0 && offset.dy === 0 ? `transform ${duration}s cubic-bezier(0.22, 0.61, 0.36, 1)` : "none",
+        willChange: "transform",
       }}
     >
       {children}
     </g>
   );
 }
+
 
 
 export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled, dropState = null, onDrop }: Props) {
