@@ -27,6 +27,30 @@ type Props = {
 
 const HEX_SIZE = 34;
 
+// ⏱️ VELOCITÀ ANIMAZIONE MOSSA: secondi per ogni cella percorsa
+// (1 passo = 0.15s, 2 passi = 0.30s). Modifica solo questo valore.
+export const MOVE_ANIM_SECONDS_PER_CELL = 0.15;
+
+// Slides the piece from its previous cell to the new one.
+function SlideIn({ dx, dy, duration, children }: { dx: number; dy: number; duration: number; children: React.ReactNode }) {
+  const [offset, setOffset] = useState({ dx, dy });
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setOffset({ dx: 0, dy: 0 }));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return (
+    <g
+      style={{
+        transform: `translate(${offset.dx}px, ${offset.dy}px)`,
+        transition: `transform ${duration}s cubic-bezier(0.22, 0.61, 0.36, 1)`,
+      }}
+    >
+      {children}
+    </g>
+  );
+}
+
+
 export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled, dropState = null, onDrop }: Props) {
   const { t } = useI18n();
   const bounds = useMemo(() => boardPixelBounds(HEX_SIZE), []);
