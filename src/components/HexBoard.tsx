@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   allCells,
   axialToPixel,
@@ -35,7 +35,7 @@ export const MOVE_ANIM_SECONDS_PER_CELL = 0.15;
 // Slides the piece from its previous cell to the new one.
 function SlideIn({ dx, dy, duration, children }: { dx: number; dy: number; duration: number; children: React.ReactNode }) {
   const [offset, setOffset] = useState({ dx, dy });
-  useEffect(() => {
+  useLayoutEffect(() => {
     const raf = requestAnimationFrame(() => setOffset({ dx: 0, dy: 0 }));
     return () => cancelAnimationFrame(raf);
   }, []);
@@ -43,13 +43,15 @@ function SlideIn({ dx, dy, duration, children }: { dx: number; dy: number; durat
     <g
       style={{
         transform: `translate(${offset.dx}px, ${offset.dy}px)`,
-        transition: `transform ${duration}s cubic-bezier(0.22, 0.61, 0.36, 1)`,
+        transition: offset.dx === 0 && offset.dy === 0 ? `transform ${duration}s cubic-bezier(0.22, 0.61, 0.36, 1)` : "none",
+        willChange: "transform",
       }}
     >
       {children}
     </g>
   );
 }
+
 
 
 export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled, dropState = null, onDrop }: Props) {
@@ -79,32 +81,36 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
   // For E + 2 steps on an empty cell we need to ask the player M or T.
   const [pending, setPending] = useState<{ from: Axial; to: Axial; choices: PieceState[] } | null>(null);
 
-  // Detect the last move by diffing the pieces map, so the arriving piece
-  // can slide from its origin cell to the destination cell.
+  // Detect the last move by diffing the pieces map during render (not in an
+  // effect) so the arriving piece never paints once at its destination first.
   const prevPieces = useRef(state.pieces);
-  const [anim, setAnim] = useState<{ to: string; dx: number; dy: number; duration: number; id: number } | null>(null);
-  useEffect(() => {
+  const animRef = useRef<{ to: string; dx: number; dy: number; duration: number; id: number } | null>(null);
+  if (prevPieces.current !== state.pieces) {
     const prev = prevPieces.current;
     prevPieces.current = state.pieces;
-    if (prev === state.pieces) return;
-    const prevKeys = Object.keys(prev);
+    animRef.current = null;
     const nowKeys = Object.keys(state.pieces);
-    const removed = prevKeys.filter((k) => !state.pieces[k]);
+    const removed = Object.keys(prev).filter((k) => !state.pieces[k]);
     const added = nowKeys.filter((k) => !prev[k]);
     const changed = nowKeys.filter((k) => {
       const a = prev[k];
       const b = state.pieces[k];
       return a && b && (a.owner !== b.owner || a.kind !== b.kind || a.state !== b.state);
     });
-    if (removed.length !== 1) return;
-    const from = removed[0];
-    const to = added[0] ?? changed[0];
-    if (!to) return;
-    const a = axialToPixel(fromKey(from), HEX_SIZE);
-    const b = axialToPixel(fromKey(to), HEX_SIZE);
-    const steps = Math.max(1, distance(fromKey(from), fromKey(to)));
-    setAnim({ to, dx: a.x - b.x, dy: a.y - b.y, duration: steps * MOVE_ANIM_SECONDS_PER_CELL, id: Date.now() });
-  }, [state.pieces]);
+    if (removed.length === 1) {
+      const from = removed[0];
+      const to = added[0] ?? changed[0];
+      if (to) {
+        const a = axialToPixel(fromKey(from), HEX_SIZE);
+        const b = axialToPixel(fromKey(to), HEX_SIZE);
+        const steps = Math.max(1, distance(fromKey(from), fromKey(to)));
+        animRef.current = { to, dx: a.x - b.x, dy: a.y - b.y, duration: steps * MOVE_ANIM_SECONDS_PER_CELL, id: Date.now() };
+      }
+    }
+  }
+  const anim = animRef.current;
+
+
 
   // Board is stored with yellow on top; flip it so the viewing faction sits at
   // the bottom (default view: yellow below, purple above).
