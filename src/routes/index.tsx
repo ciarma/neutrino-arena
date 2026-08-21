@@ -152,16 +152,10 @@ function RulesIt() {
     <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
       <li>Un giocatore controlla i <span className="italic text-[color:var(--faction-yellow)]">Neutrini</span>, l'altro gli <span className="italic text-[color:var(--faction-purple)]">Anti-Neutrini</span>. I neutrini esistono in 3 diversi tipi, o <b>Sapori</b>: <span className="italic text-[color:blue]">Elettronico</span>, <span className="italic text-[color:green]">Muonico</span> e <span className="italic text-[color:red]">Tauonico</span>.</li>
       <li>Ogni giocatore ha 5 Pezzi Neutrino e 1 Pezzo Re Neutrino (♛).</li>
+      <li>Quando un pezzo viene mosso, cambia di Sapore per il fenomeno dell'Oscillazione in base alla distanza percorsa.</li>
+      <li>Catture e Scacchi dipendono dal Sapore del pezzo alla fine del movimento.</li>
       <li>· Vince chi da <b>Scacco Matto al Re Neutrino avversario</b> oppure chi <b>cattura tutti gli altri Pezzi Neutrino</b>.</li>
-      <li>Neutrino Arena è un <b>gioco a turni</b>. Cominciando dal Primo Giocatore, ogni Giocatore può fare una delle seguenti <b>Azioni</b>: <b>Muovere</b> oppure <b>Schierare un Pezzo Catturato</b>.</li>
-      <li><b>Muovere - </b>Muovi un Pezzo di 1 o 2 celle in linea retta (possono scavalcarsi). A causa del fenomeno dell’Oscillazione, il tuo Pezzo Neutrino <b>cambierà Sapore</b> a seconda della distanza percorsa.</li>
-      <li>· Il tabellone è diviso in una Zona di Battaglia (al centro) e due Zone di Schieramento (da dove partono le due squadre). Dalla Zona di Schieramento puoi muovere solo <u>in avanti</u> verso la Zona di Battaglia. Dalla Zona di Battaglia <u>non si puo mai entrare</u> in una Zona di Schieramento.</li>
-      <li>· Per <b>Catturare</b> un pezzo avversario finisci il tuo movimento su di esso con il suo stesso Sapore.</li>
-      <li>· Se dopo una mossa un Re Neutrino potrebbe essere Catturato, si dice <b>Sotto Scacco</b> e deve essere mosso in un posto sicuro oppure rimossa la minaccia. <u>Attenzione: i Re Neutrino non possono Catturare i Pezzi Neutrino!</u> I Re Neutrino possono essere messi sotto scacco <b>anche quando si trovano nella Zona di Schieramento</b>. Se non c’è modo di salvare il Re allora si dice <b>Scacco Matto</b> e la partita finisce.</li>
-      <li>· Muovere il proprio Re Neutrino in una cella nella quale sarebbe sotto scacco è una <b>mossa illegale</b>.</li>
-      <li>· <u>I Re Neutrino possono “catturare” solo l’altro Re Neutrino.</u> Ciò significa che muovere il proprio Re Neutrino in una Cella dove potrebbe essere catturato dal Re Neutrino avversario è una <b>mossa illegale</b>.</li>
-      <li><b>Schierare un Pezzo Catturato - </b>Metti un Pezzo che hai Catturato in una cella libera della tua Zona di Schieramento (diventa del tuo colore). Non puoi cambiare il Sapore del Pezzo prima di Schierarlo. Da adesso in poi trattalo come uno qualsiasi dei tuoi Pezzi.</li>
-    </ul>
+      </ul>
   );
 }
 
@@ -170,15 +164,9 @@ function RulesEn() {
     <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
       <li>One player controls the <span className="italic text-[color:var(--faction-yellow)]">Neutrinos</span>, the other the <span className="italic text-[color:var(--faction-purple)]">Anti-Neutrinos</span>. Neutrinos come in 3 types, or <b>Flavours</b>: <span className="italic text-[color:blue]">Electron</span>, <span className="italic text-[color:green]">Muon</span> and <span className="italic text-[color:red]">Tau</span>.</li>
       <li>Each player has 5 Neutrino Pieces and 1 Neutrino King (♛).</li>
+      <li>When you move a piece, it changes Flavour due to the Oscillation process according to the traveled distance.</li>
+      <li> Captures and Checks depend on the piece Flavour at the end of the movement.</li>
       <li>· You win by delivering <b>Checkmate to the opposing Neutrino King</b> or by <b>capturing all the other Neutrino Pieces</b>.</li>
-      <li>Neutrino Arena is a <b>turn-based game</b>. Starting from the First Player, each player may take one of these <b>Actions</b>: <b>Move</b> or <b>Deploy a Captured Piece</b>.</li>
-      <li><b>Move - </b>Move a Piece 1 or 2 cells in a straight line (pieces may jump over each other). Because of Oscillation, your Neutrino Piece <b>changes Flavour</b> depending on the distance travelled.</li>
-      <li>· The board is split into a Battle Zone (the centre) and two Deployment Zones (where each team starts). From your Deployment Zone you can only move <u>forward</u> towards the Battle Zone. From the Battle Zone you can <u>never enter</u> a Deployment Zone.</li>
-      <li>· To <b>Capture</b> an enemy piece, end your movement on it with the same Flavour it has.</li>
-      <li>· If after a move a Neutrino King could be Captured, it is <b>in Check</b> and must be moved to safety or the threat removed. <u>Careful: Neutrino Kings cannot Capture Neutrino Pieces!</u> Kings can be put in check <b>even inside a Deployment Zone</b>. If there is no way to save the King it is <b>Checkmate</b> and the game ends.</li>
-      <li>· Moving your own Neutrino King into a cell where it would be in check is an <b>illegal move</b>.</li>
-      <li>· <u>Neutrino Kings can only “capture” the other Neutrino King.</u> So moving your King to a cell where the enemy King could capture it is an <b>illegal move</b>.</li>
-      <li><b>Deploy a Captured Piece - </b>Place a Piece you Captured on a free cell of your Deployment Zone (it becomes your colour). You cannot change its Flavour before deploying. From then on treat it like any of your own Pieces.</li>
-    </ul>
+      </ul>
   );
 }
