@@ -78,6 +78,33 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
   // For E + 2 steps on an empty cell we need to ask the player M or T.
   const [pending, setPending] = useState<{ from: Axial; to: Axial; choices: PieceState[] } | null>(null);
 
+  // Detect the last move by diffing the pieces map, so the arriving piece
+  // can slide from its origin cell to the destination cell.
+  const prevPieces = useRef(state.pieces);
+  const [anim, setAnim] = useState<{ to: string; dx: number; dy: number; duration: number; id: number } | null>(null);
+  useEffect(() => {
+    const prev = prevPieces.current;
+    prevPieces.current = state.pieces;
+    if (prev === state.pieces) return;
+    const prevKeys = Object.keys(prev);
+    const nowKeys = Object.keys(state.pieces);
+    const removed = prevKeys.filter((k) => !state.pieces[k]);
+    const added = nowKeys.filter((k) => !prev[k]);
+    const changed = nowKeys.filter((k) => {
+      const a = prev[k];
+      const b = state.pieces[k];
+      return a && b && (a.owner !== b.owner || a.kind !== b.kind || a.state !== b.state);
+    });
+    if (removed.length !== 1) return;
+    const from = removed[0];
+    const to = added[0] ?? changed[0];
+    if (!to) return;
+    const a = axialToPixel(fromKey(from), HEX_SIZE);
+    const b = axialToPixel(fromKey(to), HEX_SIZE);
+    const steps = Math.max(1, distance(fromKey(from), fromKey(to)));
+    setAnim({ to, dx: a.x - b.x, dy: a.y - b.y, duration: steps * MOVE_ANIM_SECONDS_PER_CELL, id: Date.now() });
+  }, [state.pieces]);
+
   // Board is stored with yellow on top; flip it so the viewing faction sits at
   // the bottom (default view: yellow below, purple above).
   const rotation = perspective === "purple" ? 0 : 180;
