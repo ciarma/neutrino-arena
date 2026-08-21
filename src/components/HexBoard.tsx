@@ -1,10 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   allCells,
   axialToPixel,
   boardPixelBounds,
   cellName,
   deploymentZone,
+  distance,
+  fromKey,
   hexCorners,
   key,
   type Axial,
@@ -25,6 +27,30 @@ type Props = {
 };
 
 const HEX_SIZE = 34;
+
+// ⏱️ VELOCITÀ ANIMAZIONE MOSSA: secondi per ogni cella percorsa
+// (1 passo = 0.15s, 2 passi = 0.30s). Modifica solo questo valore.
+export const MOVE_ANIM_SECONDS_PER_CELL = 0.15;
+
+// Slides the piece from its previous cell to the new one.
+function SlideIn({ dx, dy, duration, children }: { dx: number; dy: number; duration: number; children: React.ReactNode }) {
+  const [offset, setOffset] = useState({ dx, dy });
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setOffset({ dx: 0, dy: 0 }));
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return (
+    <g
+      style={{
+        transform: `translate(${offset.dx}px, ${offset.dy}px)`,
+        transition: `transform ${duration}s cubic-bezier(0.22, 0.61, 0.36, 1)`,
+      }}
+    >
+      {children}
+    </g>
+  );
+}
+
 
 export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled, dropState = null, onDrop }: Props) {
   const { t } = useI18n();
@@ -52,6 +78,33 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
 
   // For E + 2 steps on an empty cell we need to ask the player M or T.
   const [pending, setPending] = useState<{ from: Axial; to: Axial; choices: PieceState[] } | null>(null);
+
+  // Detect the last move by diffing the pieces map, so the arriving piece
+  // can slide from its origin cell to the destination cell.
+  const prevPieces = useRef(state.pieces);
+  const [anim, setAnim] = useState<{ to: string; dx: number; dy: number; duration: number; id: number } | null>(null);
+  useEffect(() => {
+    const prev = prevPieces.current;
+    prevPieces.current = state.pieces;
+    if (prev === state.pieces) return;
+    const prevKeys = Object.keys(prev);
+    const nowKeys = Object.keys(state.pieces);
+    const removed = prevKeys.filter((k) => !state.pieces[k]);
+    const added = nowKeys.filter((k) => !prev[k]);
+    const changed = nowKeys.filter((k) => {
+      const a = prev[k];
+      const b = state.pieces[k];
+      return a && b && (a.owner !== b.owner || a.kind !== b.kind || a.state !== b.state);
+    });
+    if (removed.length !== 1) return;
+    const from = removed[0];
+    const to = added[0] ?? changed[0];
+    if (!to) return;
+    const a = axialToPixel(fromKey(from), HEX_SIZE);
+    const b = axialToPixel(fromKey(to), HEX_SIZE);
+    const steps = Math.max(1, distance(fromKey(from), fromKey(to)));
+    setAnim({ to, dx: a.x - b.x, dy: a.y - b.y, duration: steps * MOVE_ANIM_SECONDS_PER_CELL, id: Date.now() });
+  }, [state.pieces]);
 
   // Board is stored with yellow on top; flip it so the viewing faction sits at
   // the bottom (default view: yellow below, purple above).
@@ -191,7 +244,8 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
                   strokeDasharray="4 3"
                 />
               )}
-              {piece && (
+              {piece && (() => {
+                const inner = (
                 <g style={{ transform: `rotate(${-rotation}deg)`, transformOrigin: `${cx}px ${cy}px` }}>
                   <ellipse cx={cx} cy={cy + HEX_SIZE * 0.62} rx={HEX_SIZE * 0.45} ry={HEX_SIZE * 0.14} fill="oklch(0 0 0 / 0.2)" />
                   <image
@@ -203,7 +257,11 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
                     style={{ pointerEvents: "none" }}
                   />
                 </g>
-              )}
+                );
+                return anim && anim.to === k ? (
+                  <SlideIn key={anim.id} dx={anim.dx} dy={anim.dy} duration={anim.duration}>{inner}</SlideIn>
+                ) : inner;
+              })()}
 
               {!piece && (
                 <text
