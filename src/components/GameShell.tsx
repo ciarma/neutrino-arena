@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import type { Faction, GameState } from "@/lib/game";
-import { isInCheck, piecesOf } from "@/lib/game";
+import { piecesOf } from "@/lib/game";
 import { SoundToggle } from "@/components/SoundToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/lib/i18n";
