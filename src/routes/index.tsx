@@ -87,26 +87,27 @@ function Home() {
           <div>
             <h2 className="font-serif text-2xl">{t("home.howTo")}</h2>
             {lang === "it" ? <RulesIt /> : <RulesEn />}
+            <div className="mt-6 flex flex-wrap items-center gap-4">
+              <PdfViewerModal />
+              <a
+                href={getRulesPdfPath(lang)}
+                download
+                className="text-sm font-medium hover:underline"
+              >
+                {t("rules.download")}
+              </a>
+            </div>
           </div>
           <div className="rounded-2xl border border-border/40 bg-background/60 p-6">
             <p className="font-serif text-xl">{t("home.wip")}</p>
             <p className="mt-2 text-sm text-muted-foreground">
               {t("home.author")}
-			  <a href="https://web.infn.it/game/"
-				target="_blank"
-  				rel="noopener noreferrer"
-  				className="text-blue-600 hover:underline font-semibold"
-			  >{t("home.site")}</a>
-	      
+              <a href="https://web.infn.it/game/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline font-semibold"
+              >{t("home.site")}</a>
             </p>
-	    <PdfViewerModal />
-      <a
-  		href={getRulesPdfPath(lang)}
-  		download
-  		className="text-sm font-medium hover:underline"
-  	>
-  {t("rules.download")}
-</a>
           </div>
         </section>
       </div>
