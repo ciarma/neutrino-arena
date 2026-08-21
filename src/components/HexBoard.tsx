@@ -6,6 +6,7 @@ import {
   cellName,
   deploymentZone,
   distance,
+  fromKey,
   hexCorners,
   key,
   type Axial,
@@ -243,7 +244,8 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
                   strokeDasharray="4 3"
                 />
               )}
-              {piece && (
+              {piece && (() => {
+                const inner = (
                 <g style={{ transform: `rotate(${-rotation}deg)`, transformOrigin: `${cx}px ${cy}px` }}>
                   <ellipse cx={cx} cy={cy + HEX_SIZE * 0.62} rx={HEX_SIZE * 0.45} ry={HEX_SIZE * 0.14} fill="oklch(0 0 0 / 0.2)" />
                   <image
@@ -255,7 +257,11 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
                     style={{ pointerEvents: "none" }}
                   />
                 </g>
-              )}
+                );
+                return anim && anim.to === k ? (
+                  <SlideIn key={anim.id} dx={anim.dx} dy={anim.dy} duration={anim.duration}>{inner}</SlideIn>
+                ) : inner;
+              })()}
 
               {!piece && (
                 <text
