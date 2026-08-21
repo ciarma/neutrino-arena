@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   allCells,
   axialToPixel,
   boardPixelBounds,
   cellName,
   deploymentZone,
+  distance,
   hexCorners,
   key,
   type Axial,
