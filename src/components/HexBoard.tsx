@@ -306,14 +306,14 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
                     <button
                       key={s}
                       onClick={() => { const p = pending; setPending(null); onMove(p.from, p.to, s); }}
-                      className="flex h-14 w-14 items-center justify-center rounded-full border border-border bg-background hover:bg-accent transition"
+                      className="flex h-24 w-24 items-center justify-center rounded-full border border-border bg-background hover:bg-accent transition"
                       title={s}
                     >
                       {movingPiece ? (
                         <img
                           src={pieceImage(movingPiece.owner, movingPiece.kind, s)}
                           alt={s}
-                          className="h-10 w-10 object-contain"
+                          className="h-17 w-17 object-contain"
                         />
                       ) : (
                         <span className="text-sm font-bold">{s}</span>
