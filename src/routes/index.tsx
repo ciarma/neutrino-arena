@@ -34,7 +34,27 @@ function Home() {
         </div>
       </div>
       <div className="mx-auto max-w-5xl px-6 py-16">
-        <header className="mb-16 flex items-center justify-end">
+        <header className="mb-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <a
+              href="https://example.org/infn"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Logo INFN"
+              className="block h-12 w-24 rounded-md bg-muted/60 ring-1 ring-border/60 transition hover:bg-accent"
+            >
+              <img src="/logo-infn.png" alt="Logo INFN" className="h-full w-full object-contain" />
+            </a>
+            <a
+              href="https://example.org/infn-game"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Logo INFN Game"
+              className="block h-12 w-24 rounded-md bg-muted/60 ring-1 ring-border/60 transition hover:bg-accent"
+            >
+              <img src="/logo-infn-game.png" alt="Logo INFN Game" className="h-full w-full object-contain" />
+            </a>
+          </div>
           <LanguageToggle />
         </header>
 
