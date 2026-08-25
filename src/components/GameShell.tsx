@@ -46,17 +46,12 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <FactionBadge faction="yellow" count={yellow} active={state.turn === "yellow" && !state.winner} perspective={perspective} />
           <div className="text-center text-sm text-muted-foreground">
-            {status ?? (
-              <>
-                {state.winner ? (
-                  <span className="font-medium text-foreground">
-                    {t("shell.win", { faction: factionName(state.winner) })}
-                  </span>
-                ) : (
-                  <span>{t("shell.turn", { faction: factionName(state.turn), n: state.moves + 1 })}</span>
-                )}
-              </>
-            )}
+            {status ??
+              (state.winner ? (
+                <span className="font-medium text-foreground">
+                  {t("shell.win", { faction: factionName(state.winner) })}
+                </span>
+              ) : null)}
           </div>
           <FactionBadge faction="purple" count={purple} active={state.turn === "purple" && !state.winner} perspective={perspective} />
         </div>
