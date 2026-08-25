@@ -138,10 +138,10 @@ function FactionBadge({
       <img
         src={faction === "yellow" ? factionYellowImg : factionPurpleImg}
         alt={faction === "yellow" ? t("faction.yellow") : t("faction.purple")}
-        width={faction === "yellow" ? 16 : 26}
-        height={faction === "yellow" ? 16 : 26}
+        width={26}
+        height={26}
         loading="lazy"
-        className={`inline-block rounded-full object-cover ${faction === "yellow" ? "h-4 w-4" : "h-[26px] w-[26px]"}`}
+        className="inline-block h-[26px] w-[26px] rounded-full object-cover"
       />
       <span className="font-medium capitalize">
         {faction === "yellow" ? t("faction.yellow") : t("faction.purple")}
