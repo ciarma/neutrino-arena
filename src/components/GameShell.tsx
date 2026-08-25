@@ -43,11 +43,6 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6">
-        {!state.winner && isInCheck(state, state.turn) && (
-          <div className="mb-4 rounded-2xl border-2 border-destructive/70 bg-destructive/10 px-4 py-3 text-center text-sm font-medium text-destructive">
-            {t("shell.check", { faction: factionName(state.turn) })}
-          </div>
-        )}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <FactionBadge faction="yellow" count={yellow} active={state.turn === "yellow" && !state.winner} perspective={perspective} />
           <div className="text-center text-sm text-muted-foreground">
