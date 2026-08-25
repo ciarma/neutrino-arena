@@ -34,12 +34,7 @@ function Home() {
         </div>
       </div>
       <div className="mx-auto max-w-5xl px-6 py-16">
-        <header className="mb-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-serif text-lg tracking-wide">
-            <span className="inline-block h-3 w-3 rounded-full bg-[color:var(--faction-yellow)]" />
-            <span>Neutrino Arena</span>
-            <span className="inline-block h-3 w-3 rounded-full bg-[color:var(--faction-purple)]" />
-          </div>
+        <header className="mb-16 flex items-center justify-end">
           <LanguageToggle />
         </header>
 
