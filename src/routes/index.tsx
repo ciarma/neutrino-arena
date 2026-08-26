@@ -148,17 +148,20 @@ function ModeCard({
       : accent === "purple"
         ? "/mode-online.jpg"
         : "/mode-ai.jpg";
-  const fg = accent === "purple" ? "oklch(0.98 0.01 90)" : "oklch(0.22 0.04 300)";
   return (
     <Link
       to={to}
-      className="group relative overflow-hidden rounded-2xl border border-border/50 p-6 transition hover:-translate-y-1 hover:shadow-xl"
-      style={{ backgroundImage: `url(${bgImage})`, backgroundSize: "cover", backgroundPosition: "center", color: fg }}
+      className="group relative overflow-hidden rounded-2xl border border-border/50 p-6 transition hover:-translate-y-1"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "bottom right",
+        color: "oklch(0.22 0.04 300)",
+      }}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
       <div className="relative">
-        <p className="font-serif text-2xl drop-shadow-sm">{title}</p>
-        <p className="mt-2 text-sm opacity-90 drop-shadow-sm">{desc}</p>
+        <p className="font-serif text-2xl">{title}</p>
+        <p className="mt-2 text-sm opacity-90">{desc}</p>
         <p className="mt-6 text-sm font-medium opacity-80 group-hover:opacity-100">{t("home.play")}</p>
       </div>
     </Link>
