@@ -37,7 +37,7 @@ function Home() {
         <header className="mb-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <a
-              href="https://example.org/infn"
+              href="https://www.infn.it"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Logo INFN"
@@ -46,7 +46,7 @@ function Home() {
               <img src="/logo-infn.png" alt="Logo INFN" className="h-full w-full object-contain" />
             </a>
             <a
-              href="https://example.org/infn-game"
+              href="https://web.infn.it/game/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Logo INFN Game"
