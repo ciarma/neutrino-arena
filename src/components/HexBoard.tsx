@@ -294,6 +294,17 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
               {isDropTarget && (
                 <circle cx={cx} cy={cy} r={HEX_SIZE * 0.3} fill="oklch(0.62 0.2 150 / 0.3)" />
               )}
+              {cursor && cursor.q === cell.q && cursor.r === cell.r && (
+                <polygon
+                  points={hexCorners(cx, cy, HEX_SIZE - 2)}
+                  fill="none"
+                  stroke="oklch(0.45 0.02 90)"
+                  strokeWidth={3.5}
+                  style={{ pointerEvents: "none" }}
+                >
+                  <animate attributeName="opacity" values="1;0.35;1" dur="1.1s" repeatCount="indefinite" />
+                </polygon>
+              )}
 
               {isTarget && !isCapture && (
                 <circle cx={cx} cy={cy} r={HEX_SIZE * 0.28} fill="oklch(0.55 0.22 300 / 0.35)" />
