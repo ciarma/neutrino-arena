@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   allCells,
   axialToPixel,
@@ -80,6 +80,9 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
 
   // For E + 2 steps on an empty cell we need to ask the player M or T.
   const [pending, setPending] = useState<{ from: Axial; to: Axial; choices: PieceState[] } | null>(null);
+
+  // ⌨️ Keyboard cursor: appears only after the first key press.
+  const [cursor, setCursor] = useState<Axial | null>(null);
 
   // Detect the last move by diffing the pieces map during render (not in an
   // effect) so the arriving piece never paints once at its destination first.
