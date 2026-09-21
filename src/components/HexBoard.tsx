@@ -8,6 +8,7 @@ import {
   distance,
   fromKey,
   hexCorners,
+  inBounds,
   key,
   type Axial,
 } from "@/lib/hex";
