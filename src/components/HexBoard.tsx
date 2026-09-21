@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   allCells,
   axialToPixel,
@@ -8,6 +8,7 @@ import {
   distance,
   fromKey,
   hexCorners,
+  inBounds,
   key,
   type Axial,
 } from "@/lib/hex";
@@ -81,6 +82,9 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
   // For E + 2 steps on an empty cell we need to ask the player M or T.
   const [pending, setPending] = useState<{ from: Axial; to: Axial; choices: PieceState[] } | null>(null);
 
+  // ⌨️ Keyboard cursor: appears only after the first key press.
+  const [cursor, setCursor] = useState<Axial | null>(null);
+
   // Detect the last move by diffing the pieces map during render (not in an
   // effect) so the arriving piece never paints once at its destination first.
   const prevPieces = useRef(state.pieces);
@@ -149,6 +153,59 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
       onSelect(cell);
     }
   };
+
+  // Keep the latest click handler available to the keyboard listener.
+  const clickRef = useRef(handleCellClick);
+  clickRef.current = handleCellClick;
+
+  useEffect(() => {
+    // Arrow keys move a cursor over the diamond; Enter acts like a click and
+    // Backspace steps back (cancel choice / deselect).
+    const flip = rotation === 180 ? -1 : 1;
+    const step = (from: Axial, dirs: Axial[]): Axial => {
+      for (const d of dirs) {
+        const next = { q: from.q + d.q * flip, r: from.r + d.r * flip };
+        if (inBounds(next)) return next;
+      }
+      return from;
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (disabled) return;
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+      const arrows: Record<string, Axial[]> = {
+        ArrowLeft: [{ q: 1, r: -1 }],
+        ArrowRight: [{ q: -1, r: 1 }],
+        ArrowUp: [{ q: -1, r: 0 }, { q: 0, r: -1 }],
+        ArrowDown: [{ q: 1, r: 0 }, { q: 0, r: 1 }],
+      };
+
+      if (arrows[e.key]) {
+        e.preventDefault();
+        setCursor((c) => (c ? step(c, arrows[e.key]) : selected ?? { q: 2, r: 2 }));
+        return;
+      }
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (pending) return;
+        if (cursor) clickRef.current(cursor);
+        else setCursor(selected ?? { q: 2, r: 2 });
+        return;
+      }
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        if (pending) setPending(null);
+        else if (selected) onSelect(null);
+        else if (!cursor) setCursor({ q: 2, r: 2 });
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [cursor, selected, pending, disabled, rotation, onSelect]);
 
   const turnColor = state.turn === "yellow" ? "oklch(0.82 0.18 90)" : "oklch(0.55 0.22 300)";
 
@@ -236,6 +293,17 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
               )}
               {isDropTarget && (
                 <circle cx={cx} cy={cy} r={HEX_SIZE * 0.3} fill="oklch(0.62 0.2 150 / 0.3)" />
+              )}
+              {cursor && cursor.q === cell.q && cursor.r === cell.r && (
+                <polygon
+                  points={hexCorners(cx, cy, HEX_SIZE - 2)}
+                  fill="none"
+                  stroke="oklch(0.45 0.02 90)"
+                  strokeWidth={3.5}
+                  style={{ pointerEvents: "none" }}
+                >
+                  <animate attributeName="opacity" values="1;0.35;1" dur="1.1s" repeatCount="indefinite" />
+                </polygon>
               )}
 
               {isTarget && !isCapture && (
