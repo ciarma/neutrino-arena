@@ -81,6 +81,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
 
   // For E + 2 steps on an empty cell we need to ask the player M or T.
   const [pending, setPending] = useState<{ from: Axial; to: Axial; choices: PieceState[] } | null>(null);
+  const [pendingChoiceIndex, setPendingChoiceIndex] = useState(0);
 
   // ⌨️ Keyboard cursor: appears only after the first key press.
   const [cursor, setCursor] = useState<Axial | null>(null);
@@ -135,6 +136,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
       if (isTarget) {
         const choices = legalStateChoices(state, selected, cell);
         if (choices.length > 1) {
+          setPendingChoiceIndex(0);
           setPending({ from: selected, to: cell, choices });
           return;
         }
@@ -182,6 +184,26 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
         ArrowDown: [{ q: 1, r: 0 }, { q: 0, r: 1 }],
       };
 
+      if (pending) {
+        const availableChoices = (["M", "T"] as const).filter((choice) => pending.choices.includes(choice));
+        if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") {
+          e.preventDefault();
+          const direction = e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 1;
+          setPendingChoiceIndex((current) => (current + direction + availableChoices.length) % availableChoices.length);
+          return;
+        }
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const choice = availableChoices[pendingChoiceIndex];
+          if (choice) {
+            const move = pending;
+            setPending(null);
+            onMove(move.from, move.to, choice);
+          }
+          return;
+        }
+      }
+
       if (arrows[e.key]) {
         e.preventDefault();
         setCursor((c) => (c ? step(c, arrows[e.key]) : selected ?? { q: 2, r: 2 }));
@@ -189,7 +211,6 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
       }
       if (e.key === "Enter") {
         e.preventDefault();
-        if (pending) return;
         if (cursor) clickRef.current(cursor);
         else setCursor(selected ?? { q: 2, r: 2 });
         return;
@@ -205,7 +226,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [cursor, selected, pending, disabled, rotation, onSelect]);
+  }, [cursor, selected, pending, pendingChoiceIndex, disabled, rotation, onSelect, onMove]);
 
   const turnColor = state.turn === "yellow" ? "oklch(0.82 0.18 90)" : "oklch(0.55 0.22 300)";
 
@@ -297,10 +318,11 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
               {cursor && cursor.q === cell.q && cursor.r === cell.r && (
                 <polygon
                   points={hexCorners(cx, cy, HEX_SIZE - 2)}
-                  fill="none"
-                  stroke="oklch(0.45 0.02 90)"
-                  strokeWidth={3.5}
-                  style={{ pointerEvents: "none" }}
+                  fill={turnColor}
+                  fillOpacity={0.18}
+                  stroke={turnColor}
+                  strokeWidth={4.5}
+                  style={{ pointerEvents: "none", filter: `drop-shadow(0 0 5px ${turnColor})` }}
                 >
                   <animate attributeName="opacity" values="1;0.35;1" dur="1.1s" repeatCount="indefinite" />
                 </polygon>
@@ -368,14 +390,18 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
             <div className="flex justify-center gap-3">
               {(["M", "T"] as const)
                 .filter((s) => pending.choices.includes(s))
-                .map((s) => {
+                .map((s, choiceIndex) => {
                   const movingPiece = state.pieces[key(pending.from)];
+                  const isKeyboardChoice = choiceIndex === pendingChoiceIndex;
                   return (
                     <button
                       key={s}
-                      onClick={() => { const p = pending; setPending(null); onMove(p.from, p.to, s); }}
-                      className="flex h-24 w-24 items-center justify-center rounded-full border border-border bg-background hover:bg-accent transition"
+                      onClick={() => { const p = pending; setPendingChoiceIndex(choiceIndex); setPending(null); onMove(p.from, p.to, s); }}
+                      onMouseEnter={() => setPendingChoiceIndex(choiceIndex)}
+                      className="flex h-24 w-24 items-center justify-center rounded-full border bg-background hover:bg-accent transition"
+                      style={isKeyboardChoice ? { borderColor: turnColor, borderWidth: 4, boxShadow: `0 0 14px ${turnColor}` } : undefined}
                       title={s}
+                      aria-pressed={isKeyboardChoice}
                     >
                       {movingPiece ? (
                         <img
