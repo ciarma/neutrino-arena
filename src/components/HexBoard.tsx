@@ -153,6 +153,59 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
     }
   };
 
+  // Keep the latest click handler available to the keyboard listener.
+  const clickRef = useRef(handleCellClick);
+  clickRef.current = handleCellClick;
+
+  useEffect(() => {
+    // Arrow keys move a cursor over the diamond; Enter acts like a click and
+    // Backspace steps back (cancel choice / deselect).
+    const flip = rotation === 180 ? -1 : 1;
+    const step = (from: Axial, dirs: Axial[]): Axial => {
+      for (const d of dirs) {
+        const next = { q: from.q + d.q * flip, r: from.r + d.r * flip };
+        if (inBounds(next)) return next;
+      }
+      return from;
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (disabled) return;
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+      const arrows: Record<string, Axial[]> = {
+        ArrowLeft: [{ q: 1, r: -1 }],
+        ArrowRight: [{ q: -1, r: 1 }],
+        ArrowUp: [{ q: -1, r: 0 }, { q: 0, r: -1 }],
+        ArrowDown: [{ q: 1, r: 0 }, { q: 0, r: 1 }],
+      };
+
+      if (arrows[e.key]) {
+        e.preventDefault();
+        setCursor((c) => (c ? step(c, arrows[e.key]) : selected ?? { q: 2, r: 2 }));
+        return;
+      }
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (pending) return;
+        if (cursor) clickRef.current(cursor);
+        else setCursor(selected ?? { q: 2, r: 2 });
+        return;
+      }
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        if (pending) setPending(null);
+        else if (selected) onSelect(null);
+        else if (!cursor) setCursor({ q: 2, r: 2 });
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [cursor, selected, pending, disabled, rotation, onSelect]);
+
   const turnColor = state.turn === "yellow" ? "oklch(0.82 0.18 90)" : "oklch(0.55 0.22 300)";
 
   return (
