@@ -59,31 +59,9 @@ function AiGame() {
 
 
   if (!difficulty) {
-    return (
-      <div className="min-h-screen bg-background text-foreground">
-        <div className="mx-auto flex max-w-md flex-col items-center gap-6 px-4 py-24 text-center">
-          <h1 className="font-serif text-2xl">{t("ai.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("ai.chooseDifficulty")}</p>
-          <div className="flex w-full flex-col gap-3">
-            <button
-              onClick={() => { setDifficulty("easy"); setState(initialState()); }}
-              className="rounded-2xl border border-border bg-card px-5 py-4 text-left transition hover:bg-accent"
-            >
-              <span className="block font-medium">{t("ai.easy")}</span>
-              <span className="block text-xs text-muted-foreground">{t("ai.easyDesc")}</span>
-            </button>
-            <button
-              onClick={() => { setDifficulty("hard"); setState(initialState()); }}
-              className="rounded-2xl border border-border bg-card px-5 py-4 text-left transition hover:bg-accent"
-            >
-              <span className="block font-medium">{t("ai.hard")}</span>
-              <span className="block text-xs text-muted-foreground">{t("ai.hardDesc")}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return <DifficultyPicker onPick={(d) => { setDifficulty(d); setState(initialState()); }} />;
   }
+
 
 
   const handleMove = (from: Axial, to: Axial, chosen?: "M" | "T") => {
