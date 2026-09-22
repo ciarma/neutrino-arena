@@ -21,6 +21,18 @@ type Props = {
 
 export function GameShell({ title, subtitle, state, perspective, status, children, actions }: Props) {
   const { t } = useI18n();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        navigate({ to: "/" });
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [navigate]);
+
   const yellow = piecesOf(state, "yellow").length;
   const purple = piecesOf(state, "purple").length;
   const factionName = (f: Faction) => (f === "yellow" ? t("faction.yellow") : t("faction.purple"));
