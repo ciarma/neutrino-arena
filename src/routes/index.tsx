@@ -167,11 +167,13 @@ function ModeCard({
   desc,
   to,
   accent,
+  focused = false,
 }: {
   title: string;
   desc: string;
   to: string;
   accent: "yellow" | "purple" | "mixed";
+  focused?: boolean;
 }) {
   const { t } = useI18n();
   const bgImage =
@@ -183,7 +185,9 @@ function ModeCard({
   return (
     <Link
       to={to}
-      className="group relative overflow-hidden rounded-2xl border border-border/50 p-6 transition hover:-translate-y-1"
+      className={`group relative overflow-hidden rounded-2xl border border-border/50 p-6 transition hover:-translate-y-1 ${
+        focused ? "-translate-y-1 ring-2 ring-offset-2 ring-offset-background ring-[color:var(--faction-yellow)]" : ""
+      }`}
       style={{
         backgroundImage: `url(${bgImage})`,
         backgroundSize: "cover",
@@ -191,6 +195,7 @@ function ModeCard({
         color: "oklch(0.22 0.04 300)",
       }}
     >
+
       <div className="relative">
         <p className="font-serif text-2xl">{title}</p>
         <p className="mt-2 text-sm opacity-90">{desc}</p>
