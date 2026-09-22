@@ -1,5 +1,6 @@
+import { useEffect } from "react";
 import type { ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import type { Faction, GameState } from "@/lib/game";
 import { piecesOf } from "@/lib/game";
 import { SoundToggle } from "@/components/SoundToggle";
