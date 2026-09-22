@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import PdfViewerModal from "@/components/PdfViewerModal";
 import { getRulesPdfPath, useI18n } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
