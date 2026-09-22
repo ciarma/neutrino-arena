@@ -85,20 +85,24 @@ function Home() {
             desc={t("home.localDesc")}
             to="/game/local"
             accent="yellow"
+            focused={cursor === 0}
           />
           <ModeCard
             title={t("home.ai")}
             desc={t("home.aiDesc")}
             to="/game/ai"
             accent="mixed"
+            focused={cursor === 1}
           />
           <ModeCard
             title={t("home.online")}
             desc={t("home.onlineDesc")}
             to="/game/online"
             accent="purple"
+            focused={cursor === 2}
           />
         </section>
+
 
         <section className="mt-16 grid gap-6 rounded-3xl border border-border/60 bg-card/70 p-8 backdrop-blur sm:grid-cols-2">
           <div>
