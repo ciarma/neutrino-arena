@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { GameShell } from "@/components/GameShell";
 import { HexBoard } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type Faction, type PieceState } from "@/lib/game";
@@ -128,10 +128,15 @@ const DIFFICULTIES: Difficulty[] = ["easy", "hard"];
 
 function DifficultyPicker({ onPick }: { onPick: (d: Difficulty) => void }) {
   const { t } = useI18n();
+  const navigate = useNavigate();
   const [cursor, setCursor] = useState<number | null>(null);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        navigate({ to: "/" });
+        return;
+      }
       const keys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter", "Backspace"];
       if (!keys.includes(e.key)) return;
       e.preventDefault();
@@ -146,7 +151,7 @@ function DifficultyPicker({ onPick }: { onPick: (d: Difficulty) => void }) {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [cursor, onPick]);
+  }, [cursor, onPick, navigate]);
 
   const cls = (i: number) =>
     `rounded-2xl border bg-card px-5 py-4 text-left transition hover:bg-accent ${
