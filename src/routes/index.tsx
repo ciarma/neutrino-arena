@@ -19,9 +19,35 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+const MODE_ROUTES = ["/game/local", "/game/ai", "/game/online"] as const;
+
 function Home() {
   const { t, lang } = useI18n();
+  const navigate = useNavigate();
+  const [cursor, setCursor] = useState<number | null>(null);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
+      const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter", "Backspace"];
+      if (!keys.includes(e.key)) return;
+      e.preventDefault();
+      if (e.key === "Backspace") { setCursor(null); return; }
+      if (e.key === "Enter") {
+        if (cursor !== null) navigate({ to: MODE_ROUTES[cursor] });
+        else setCursor(0);
+        return;
+      }
+      const dir = e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 1;
+      setCursor((c) => (c === null ? (dir === 1 ? 0 : MODE_ROUTES.length - 1) : (c + dir + MODE_ROUTES.length) % MODE_ROUTES.length));
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [cursor, navigate]);
+
   return (
+
     <div className="min-h-screen" style={{ background: "var(--gradient-hero)" }}>
       <div className="mx-auto max-w-5xl px-6 pt-10">
         <div className="overflow-hidden rounded-2xl">
