@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import PdfViewerModal from "@/components/PdfViewerModal";
 import { getRulesPdfPath, useI18n } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,9 +19,35 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+const MODE_ROUTES = ["/game/local", "/game/ai", "/game/online"] as const;
+
 function Home() {
   const { t, lang } = useI18n();
+  const navigate = useNavigate();
+  const [cursor, setCursor] = useState<number | null>(null);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
+      const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter", "Backspace"];
+      if (!keys.includes(e.key)) return;
+      e.preventDefault();
+      if (e.key === "Backspace") { setCursor(null); return; }
+      if (e.key === "Enter") {
+        if (cursor !== null) navigate({ to: MODE_ROUTES[cursor] });
+        else setCursor(0);
+        return;
+      }
+      const dir = e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 1;
+      setCursor((c) => (c === null ? (dir === 1 ? 0 : MODE_ROUTES.length - 1) : (c + dir + MODE_ROUTES.length) % MODE_ROUTES.length));
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [cursor, navigate]);
+
   return (
+
     <div className="min-h-screen" style={{ background: "var(--gradient-hero)" }}>
       <div className="mx-auto max-w-5xl px-6 pt-10">
         <div className="overflow-hidden rounded-2xl">
@@ -83,20 +111,24 @@ function Home() {
             desc={t("home.localDesc")}
             to="/game/local"
             accent="yellow"
+            focused={cursor === 0}
           />
           <ModeCard
             title={t("home.ai")}
             desc={t("home.aiDesc")}
             to="/game/ai"
             accent="mixed"
+            focused={cursor === 1}
           />
           <ModeCard
             title={t("home.online")}
             desc={t("home.onlineDesc")}
             to="/game/online"
             accent="purple"
+            focused={cursor === 2}
           />
         </section>
+
 
         <section className="mt-16 grid gap-6 rounded-3xl border border-border/60 bg-card/70 p-8 backdrop-blur sm:grid-cols-2">
           <div>
@@ -135,11 +167,13 @@ function ModeCard({
   desc,
   to,
   accent,
+  focused = false,
 }: {
   title: string;
   desc: string;
   to: string;
   accent: "yellow" | "purple" | "mixed";
+  focused?: boolean;
 }) {
   const { t } = useI18n();
   const bgImage =
@@ -151,7 +185,9 @@ function ModeCard({
   return (
     <Link
       to={to}
-      className="group relative overflow-hidden rounded-2xl border border-border/50 p-6 transition hover:-translate-y-1"
+      className={`group relative overflow-hidden rounded-2xl border border-border/50 p-6 transition hover:-translate-y-1 ${
+        focused ? "-translate-y-1 ring-2 ring-offset-2 ring-offset-background ring-[color:var(--faction-yellow)]" : ""
+      }`}
       style={{
         backgroundImage: `url(${bgImage})`,
         backgroundSize: "cover",
@@ -159,6 +195,7 @@ function ModeCard({
         color: "oklch(0.22 0.04 300)",
       }}
     >
+
       <div className="relative">
         <p className="font-serif text-2xl">{title}</p>
         <p className="mt-2 text-sm opacity-90">{desc}</p>
