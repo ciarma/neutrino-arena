@@ -63,7 +63,7 @@ function SlideIn({ dx, dy, duration, children }: { dx: number; dy: number; durat
 
 
 
-export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled, dropState = null, onDrop }: Props) {
+export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled, dropState = null, onDrop, reserveCursor = null, onReserveCursor, onDropSelect }: Props) {
   const { t } = useI18n();
   const bounds = useMemo(() => boardPixelBounds(HEX_SIZE), []);
 
