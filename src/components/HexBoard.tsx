@@ -93,6 +93,9 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
 
   // ⌨️ Keyboard cursor: appears only after the first key press.
   const [cursor, setCursor] = useState<Axial | null>(null);
+  // Cell we left when the focus jumped into a reserve tray (to come back to).
+  const lastCellRef = useRef<Axial | null>(null);
+
 
   // Detect the last move by diffing the pieces map during render (not in an
   // effect) so the arriving piece never paints once at its destination first.
