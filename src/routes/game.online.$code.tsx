@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { GameShell } from "@/components/GameShell";
-import { HexBoard } from "@/components/HexBoard";
+import { HexBoard, type ReserveCursor } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type Faction, type GameState, type PieceState } from "@/lib/game";
 import { ReserveTray } from "@/components/ReserveTray";
 import { key, type Axial } from "@/lib/hex";
@@ -40,6 +40,7 @@ function OnlineGame() {
   const [past, setPast] = useState<GameState[]>([]);
   const [selected, setSelected] = useState<Axial | null>(null);
   const [dropState, setDropState] = useState<PieceState | null>(null);
+  const [reserveCursor, setReserveCursor] = useState<ReserveCursor | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -264,6 +265,9 @@ function OnlineGame() {
                 disabled={disabled}
                 dropState={dropState}
                 onDrop={handleDrop}
+                reserveCursor={reserveCursor}
+                onReserveCursor={setReserveCursor}
+                onDropSelect={(s: PieceState | null) => { setDropState(s); setSelected(null); }}
               />
             )}
             <ReserveTray
@@ -273,6 +277,7 @@ function OnlineGame() {
               selected={myFaction === f ? dropState : undefined}
               onSelect={myFaction === f ? (s: PieceState | null) => { setDropState(s); setSelected(null); } : undefined}
               interactive={myFaction === f}
+              focusIndex={reserveCursor?.faction === f ? reserveCursor.index : null}
             />
           </div>
         ))}

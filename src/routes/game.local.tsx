@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { GameShell } from "@/components/GameShell";
-import { HexBoard } from "@/components/HexBoard";
+import { HexBoard, type ReserveCursor } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type PieceState } from "@/lib/game";
 import { ReserveTray } from "@/components/ReserveTray";
 import { key, type Axial } from "@/lib/hex";
@@ -31,6 +31,7 @@ function LocalGame() {
   const [past, setPast] = useState<ReturnType<typeof initialState>[]>([]);
   const [selected, setSelected] = useState<Axial | null>(null);
   const [dropState, setDropState] = useState<PieceState | null>(null);
+  const [reserveCursor, setReserveCursor] = useState<ReserveCursor | null>(null);
 
   useEffect(() => {
     setState(initialState());
@@ -96,10 +97,12 @@ function LocalGame() {
       }
     >
       <div className="space-y-3">
-        <ReserveTray state={state} faction="purple" selected={dropState} onSelect={(s) => { setDropState(s); setSelected(null); }} interactive />
+        <ReserveTray state={state} faction="purple" selected={dropState} onSelect={(s) => { setDropState(s); setSelected(null); }} interactive focusIndex={reserveCursor?.faction === "purple" ? reserveCursor.index : null} />
         <HexBoard state={state} selected={selected} onSelect={setSelected} onMove={handleMove}
-          dropState={dropState} onDrop={handleDrop} />
-        <ReserveTray state={state} faction="yellow" selected={dropState} onSelect={(s) => { setDropState(s); setSelected(null); }} interactive />
+          dropState={dropState} onDrop={handleDrop}
+          reserveCursor={reserveCursor} onReserveCursor={setReserveCursor}
+          onDropSelect={(s) => { setDropState(s); setSelected(null); }} />
+        <ReserveTray state={state} faction="yellow" selected={dropState} onSelect={(s) => { setDropState(s); setSelected(null); }} interactive focusIndex={reserveCursor?.faction === "yellow" ? reserveCursor.index : null} />
       </div>
     </GameShell>
   );

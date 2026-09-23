@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { GameShell } from "@/components/GameShell";
-import { HexBoard } from "@/components/HexBoard";
+import { HexBoard, type ReserveCursor } from "@/components/HexBoard";
 import { applyDrop, applyMove, initialState, type Faction, type PieceState } from "@/lib/game";
 import { ReserveTray } from "@/components/ReserveTray";
 import { applyAiMove, chooseAiMove, type Difficulty } from "@/lib/ai";
@@ -32,6 +32,7 @@ function AiGame() {
   const [state, setState] = useState(() => initialState("yellow"));
   const [selected, setSelected] = useState<Axial | null>(null);
   const [dropState, setDropState] = useState<PieceState | null>(null);
+  const [reserveCursor, setReserveCursor] = useState<ReserveCursor | null>(null);
   const [thinking, setThinking] = useState(false);
 
   useEffect(() => {
@@ -113,12 +114,15 @@ function AiGame() {
       }
     >
       <div className="space-y-3">
-        <ReserveTray state={state} faction={ai} />
+        <ReserveTray state={state} faction={ai} focusIndex={reserveCursor?.faction === ai ? reserveCursor.index : null} />
         <HexBoard state={state} selected={selected} onSelect={setSelected} onMove={handleMove}
           perspective={player} disabled={thinking || state.turn !== player}
-          dropState={dropState} onDrop={handleDrop} />
+          dropState={dropState} onDrop={handleDrop}
+          reserveCursor={reserveCursor} onReserveCursor={setReserveCursor}
+          onDropSelect={(s) => { setDropState(s); setSelected(null); }} />
         <ReserveTray state={state} faction={player} selected={dropState}
-          onSelect={(s) => { setDropState(s); setSelected(null); }} interactive={!thinking} />
+          onSelect={(s) => { setDropState(s); setSelected(null); }} interactive={!thinking}
+          focusIndex={reserveCursor?.faction === player ? reserveCursor.index : null} />
       </div>
     </GameShell>
   );
