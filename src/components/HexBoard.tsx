@@ -15,6 +15,10 @@ import {
 import { isInCheck, legalDrops, legalMoves, legalStateChoices, reservesOf, type Faction, type GameState, type PieceState } from "@/lib/game";
 import { pieceImage } from "@/lib/piece-images";
 import { useI18n } from "@/lib/i18n";
+import moveTargetE from "@/assets/move-target-E.svg";
+import moveTargetM from "@/assets/move-target-M.svg";
+import moveTargetT from "@/assets/move-target-T.svg";
+import moveTargetMT from "@/assets/move-target-MT.svg";
 
 export type ReserveCursor = { faction: Faction; index: number };
 
@@ -36,6 +40,13 @@ type Props = {
 
 
 const HEX_SIZE = 34;
+
+const MOVE_TARGET_IMAGES = {
+  E: moveTargetE,
+  M: moveTargetM,
+  T: moveTargetT,
+  MT: moveTargetMT,
+} as const;
 
 // ⏱️ VELOCITÀ ANIMAZIONE MOSSA: secondi per ogni cella percorsa
 // (1 passo = 0.15s, 2 passi = 0.30s). Modifica solo questo valore.
@@ -75,6 +86,14 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
   const targets = useMemo(() => {
     if (!selected) return new Set<string>();
     return new Set(legalMoves(state, selected).map(key));
+  }, [state, selected]);
+  const targetStates = useMemo(() => {
+    const result = new Map<string, PieceState[]>();
+    if (!selected) return result;
+    for (const target of legalMoves(state, selected)) {
+      result.set(key(target), legalStateChoices(state, selected, target));
+    }
+    return result;
   }, [state, selected]);
   // King currently under check (highlighted on the board).
   const checkedKingKey = useMemo(() => {
@@ -351,6 +370,8 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
           const isDropTarget = dropTargets.has(k);
           const isTarget = targets.has(k);
           const isCapture = isTarget && piece;
+          const arrivingStates = targetStates.get(k) ?? [];
+          const targetMarker = arrivingStates.length > 1 ? "MT" : arrivingStates[0];
           const zone = deploymentZone(cell);
           const fill =
             zone === "yellow"
@@ -406,7 +427,21 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
               )}
 
               {isTarget && !isCapture && (
-                <circle cx={cx} cy={cy} r={HEX_SIZE * 0.28} fill="oklch(0.55 0.22 300 / 0.35)" />
+                targetMarker && (
+                  <image
+                    href={MOVE_TARGET_IMAGES[targetMarker]}
+                    x={cx - HEX_SIZE * 0.42}
+                    y={cy - HEX_SIZE * 0.42}
+                    width={HEX_SIZE * 0.84}
+                    height={HEX_SIZE * 0.84}
+                    aria-label={targetMarker}
+                    style={{
+                      pointerEvents: "none",
+                      transform: `rotate(${-rotation}deg)`,
+                      transformOrigin: `${cx}px ${cy}px`,
+                    }}
+                  />
+                )
               )}
               {isTarget && isCapture && (
                 <polygon
