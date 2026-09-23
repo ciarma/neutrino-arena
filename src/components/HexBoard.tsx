@@ -12,9 +12,11 @@ import {
   key,
   type Axial,
 } from "@/lib/hex";
-import { isInCheck, legalDrops, legalMoves, legalStateChoices, type Faction, type GameState, type PieceState } from "@/lib/game";
+import { isInCheck, legalDrops, legalMoves, legalStateChoices, reservesOf, type Faction, type GameState, type PieceState } from "@/lib/game";
 import { pieceImage } from "@/lib/piece-images";
 import { useI18n } from "@/lib/i18n";
+
+export type ReserveCursor = { faction: Faction; index: number };
 
 type Props = {
   state: GameState;
@@ -25,7 +27,13 @@ type Props = {
   disabled?: boolean;
   dropState?: PieceState | null;
   onDrop?: (to: Axial) => void;
+  /** Keyboard focus inside one of the reserve trays (managed by the route). */
+  reserveCursor?: ReserveCursor | null;
+  onReserveCursor?: (c: ReserveCursor | null) => void;
+  /** Selects a captured piece for dropping (same action as clicking the tray). */
+  onDropSelect?: (s: PieceState | null) => void;
 };
+
 
 const HEX_SIZE = 34;
 
