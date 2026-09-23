@@ -215,9 +215,73 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
         }
       }
 
+      const bottomFaction: Faction = perspective;
+      const topFaction: Faction = perspective === "yellow" ? "purple" : "yellow";
+
+      const backToBoard = () => {
+        onReserveCursor?.(null);
+        setCursor(lastCellRef.current ?? { q: 2, r: 2 });
+      };
+
+      // Focus is inside a reserve tray: left/right pick the piece, Enter selects,
+      // moving back toward the board (or Backspace) returns to the grid.
+      if (reserveCursor) {
+        const list = reservesOf(state, reserveCursor.faction);
+        if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+          e.preventDefault();
+          if (list.length > 0) {
+            const d = e.key === "ArrowLeft" ? -1 : 1;
+            onReserveCursor?.({ ...reserveCursor, index: (reserveCursor.index + d + list.length) % list.length });
+          }
+          return;
+        }
+        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+          e.preventDefault();
+          const leaving =
+            (reserveCursor.faction === bottomFaction && e.key === "ArrowUp") ||
+            (reserveCursor.faction === topFaction && e.key === "ArrowDown");
+          if (leaving) backToBoard();
+          return;
+        }
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (reserveCursor.faction === state.turn) {
+            const s = list[reserveCursor.index];
+            if (s) {
+              onDropSelect?.(s);
+              onReserveCursor?.(null);
+              const first = legalDrops(state, state.turn, s)[0];
+              setCursor(first ?? lastCellRef.current ?? { q: 2, r: 2 });
+            }
+          }
+          return;
+        }
+        if (e.key === "Backspace") {
+          e.preventDefault();
+          onDropSelect?.(null);
+          backToBoard();
+          return;
+        }
+      }
+
       if (arrows[e.key]) {
         e.preventDefault();
-        setCursor((c) => (c ? step(c, arrows[e.key]) : selected ?? { q: 2, r: 2 }));
+        if (!cursor) {
+          setCursor(selected ?? { q: 2, r: 2 });
+          return;
+        }
+        const next = step(cursor, arrows[e.key]);
+        if (next.q === cursor.q && next.r === cursor.r) {
+          // At the top/bottom tip of the diamond: hand the focus to the tray.
+          const trayFaction = e.key === "ArrowDown" ? bottomFaction : e.key === "ArrowUp" ? topFaction : null;
+          if (trayFaction && onReserveCursor && reservesOf(state, trayFaction).length > 0) {
+            lastCellRef.current = cursor;
+            setCursor(null);
+            onReserveCursor({ faction: trayFaction, index: 0 });
+          }
+          return;
+        }
+        setCursor(next);
         return;
       }
       if (e.key === "Enter") {
@@ -230,6 +294,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
         e.preventDefault();
         if (pending) setPending(null);
         else if (selected) onSelect(null);
+        else if (dropState) onDropSelect?.(null);
         else if (!cursor) setCursor({ q: 2, r: 2 });
         return;
       }
@@ -237,7 +302,8 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [cursor, selected, pending, pendingChoiceIndex, disabled, rotation, onSelect, onMove]);
+  }, [cursor, selected, pending, pendingChoiceIndex, disabled, rotation, onSelect, onMove, state, perspective, reserveCursor, onReserveCursor, onDropSelect, dropState]);
+
 
   const turnColor = state.turn === "yellow" ? "oklch(0.82 0.18 90)" : "oklch(0.55 0.22 300)";
 
