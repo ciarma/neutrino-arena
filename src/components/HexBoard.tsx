@@ -207,6 +207,18 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
+      // ⌨️ Alternative mapping: W/A/S/D = arrows, E = Enter, R = Backspace, X = Esc
+      const aliases: Record<string, string> = {
+        w: "ArrowUp",
+        a: "ArrowLeft",
+        s: "ArrowDown",
+        d: "ArrowRight",
+        e: "Enter",
+        r: "Backspace",
+        x: "Escape",
+      };
+      const k = aliases[e.key.length === 1 ? e.key.toLowerCase() : e.key] ?? e.key;
+
       const arrows: Record<string, Axial[]> = {
         ArrowLeft: [{ q: 1, r: -1 }],
         ArrowRight: [{ q: -1, r: 1 }],
