@@ -217,7 +217,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
         r: "Backspace",
         x: "Escape",
       };
-      const k = aliases[k.length === 1 ? k.toLowerCase() : k] ?? k;
+      const k = aliases[e.key.length === 1 ? e.key.toLowerCase() : e.key] ?? e.key;
 
       const arrows: Record<string, Axial[]> = {
         ArrowLeft: [{ q: 1, r: -1 }],
