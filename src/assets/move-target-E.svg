@@ -1,4 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <circle cx="32" cy="32" r="27" fill="#fff8cf" stroke="#5e308c" stroke-width="5"/>
-  <text x="32" y="42" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#2c163f">E</text>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g transform="matrix(1,0,0,1,2,0)">
+        <path d="M3,42L10,43L9,50L14,51L16,45L23,46L24,41L20,39L29,23L22,8L12,17L10,36L5,36L3,42Z" style="fill:rgb(50,121,178);stroke:rgb(50,121,178);stroke-width:1px;"/>
+    </g>
+    <g transform="matrix(1,0,0,1,-2,0)">
+        <path d="M41,34C55.202,30.034 59.035,27.982 56,24C49.07,14.907 34.262,34.237 38,40C42.417,46.81 57.063,42.905 59,39" style="fill:rgb(50,121,178);fill-opacity:0;"/>
+        <path d="M40.653,38.268L40.657,38.265C40.991,38.737 41.857,40.124 45.503,40.536C49.529,40.99 54.891,39.509 56.598,37.836C57.355,37.094 57.159,36.819 58.161,36.482C58.176,36.476 60.188,36.61 60.194,36.616C60.638,37.127 61.308,37.509 61.524,38.15C61.59,38.348 61.938,39.381 61.083,40.721C60.734,41.268 59.083,43.982 52.831,45.849C52.133,46.058 46.625,47.699 41.588,46.198C40.976,46.016 37.068,44.851 35.172,41.448C30.971,33.905 43.211,18.723 51.854,19.498C52.466,19.553 56.032,19.872 58.123,23.94C59.061,25.763 59.194,28.315 55.93,30.237C53.525,31.653 49.644,32.853 41.435,34.691C41.36,34.708 41.28,34.771 41.208,34.742C41.158,34.721 41.114,34.702 41.075,34.683C40.666,35.816 40.455,36.852 40.502,37.677C40.523,38.049 40.619,38.215 40.653,38.268ZM41.839,32.901C44.807,31.904 54.766,28.51 55.243,26.476C55.329,26.11 53.961,23.487 51.399,23.743C47.945,24.088 43.895,28.729 41.839,32.901Z" style="fill:rgb(50,121,178);"/>
+    </g>
 </svg>
