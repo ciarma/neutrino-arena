@@ -76,7 +76,7 @@ function LocalGame() {
   };
 
   return (
-    <GameShell title={t("local.title")} subtitle={t("local.subtitle")} state={state}
+    <GameShell splitKeys title={t("local.title")} subtitle={t("local.subtitle")} state={state}
       actions={
 	<div className="flex items-center gap-3">
 	<PdfViewerModal />
@@ -98,7 +98,7 @@ function LocalGame() {
     >
       <div className="space-y-3">
         <ReserveTray state={state} faction="purple" selected={dropState} onSelect={(s) => { setDropState(s); setSelected(null); }} interactive focusIndex={reserveCursor?.faction === "purple" ? reserveCursor.index : null} />
-        <HexBoard state={state} selected={selected} onSelect={setSelected} onMove={handleMove}
+        <HexBoard splitKeys state={state} selected={selected} onSelect={setSelected} onMove={handleMove}
           dropState={dropState} onDrop={handleDrop}
           reserveCursor={reserveCursor} onReserveCursor={setReserveCursor}
           onDropSelect={(s) => { setDropState(s); setSelected(null); }} />

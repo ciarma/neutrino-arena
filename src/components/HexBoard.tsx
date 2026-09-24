@@ -36,6 +36,8 @@ type Props = {
   onReserveCursor?: (c: ReserveCursor | null) => void;
   /** Selects a captured piece for dropping (same action as clicking the tray). */
   onDropSelect?: (s: PieceState | null) => void;
+  /** Local mode: WASD/E/R/X only for yellow, IJKL/O/P/N only for purple. */
+  splitKeys?: boolean;
 };
 
 
@@ -74,7 +76,7 @@ function SlideIn({ dx, dy, duration, children }: { dx: number; dy: number; durat
 
 
 
-export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled, dropState = null, onDrop, reserveCursor = null, onReserveCursor, onDropSelect }: Props) {
+export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled, dropState = null, onDrop, reserveCursor = null, onReserveCursor, onDropSelect, splitKeys = false }: Props) {
   const { t } = useI18n();
   const bounds = useMemo(() => boardPixelBounds(HEX_SIZE), []);
 
@@ -208,7 +210,9 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
       // ⌨️ Alternative mapping: W/A/S/D = arrows, E = Enter, R = Backspace, X = Esc
-      const aliases: Record<string, string> = {
+      const yellowKeys: Record<string, string> = { w: "ArrowUp", a: "ArrowLeft", s: "ArrowDown", d: "ArrowRight", e: "Enter", r: "Backspace", x: "Escape" };
+      const purpleKeys: Record<string, string> = { i: "ArrowUp", j: "ArrowLeft", k: "ArrowDown", l: "ArrowRight", o: "Enter", p: "Backspace", n: "Escape" };
+      const aliases: Record<string, string> = splitKeys ? (state.turn === "yellow" ? yellowKeys : purpleKeys) : {
         w: "ArrowUp",
         a: "ArrowLeft",
         s: "ArrowDown",
@@ -333,7 +337,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [cursor, selected, pending, pendingChoiceIndex, disabled, rotation, onSelect, onMove, state, perspective, reserveCursor, onReserveCursor, onDropSelect, dropState]);
+  }, [cursor, selected, pending, pendingChoiceIndex, disabled, rotation, onSelect, onMove, state, perspective, reserveCursor, onReserveCursor, onDropSelect, dropState, splitKeys]);
 
 
   const turnColor = state.turn === "yellow" ? "oklch(0.82 0.18 90)" : "oklch(0.55 0.22 300)";

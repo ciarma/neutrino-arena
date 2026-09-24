@@ -17,21 +17,26 @@ type Props = {
   status?: ReactNode;
   children: ReactNode;
   actions?: ReactNode;
+  splitKeys?: boolean;
 };
 
-export function GameShell({ title, subtitle, state, perspective, status, children, actions }: Props) {
+export function GameShell({ title, subtitle, state, perspective, status, children, actions, splitKeys = false }: Props) {
   const { t } = useI18n();
   const navigate = useNavigate();
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" || e.key.toLowerCase() === "x") {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      const key = e.key.toLowerCase();
+      const alt = splitKeys ? (state.turn === "yellow" ? "x" : "n") : "x";
+      if (e.key === "Escape" || key === alt) {
         navigate({ to: "/" });
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [navigate]);
+  }, [navigate, splitKeys, state.turn]);
 
   const yellow = piecesOf(state, "yellow").length;
   const purple = piecesOf(state, "purple").length;
