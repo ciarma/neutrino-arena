@@ -25,7 +25,7 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" || e.key.toLowerCase() === "x") {
         navigate({ to: "/" });
       }
     };

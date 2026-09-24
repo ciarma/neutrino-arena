@@ -207,6 +207,18 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
+      // ⌨️ Alternative mapping: W/A/S/D = arrows, E = Enter, R = Backspace, X = Esc
+      const aliases: Record<string, string> = {
+        w: "ArrowUp",
+        a: "ArrowLeft",
+        s: "ArrowDown",
+        d: "ArrowRight",
+        e: "Enter",
+        r: "Backspace",
+        x: "Escape",
+      };
+      const k = aliases[e.key.length === 1 ? e.key.toLowerCase() : e.key] ?? e.key;
+
       const arrows: Record<string, Axial[]> = {
         ArrowLeft: [{ q: 1, r: -1 }],
         ArrowRight: [{ q: -1, r: 1 }],
@@ -216,13 +228,13 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
 
       if (pending) {
         const availableChoices = (["M", "T"] as const).filter((choice) => pending.choices.includes(choice));
-        if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown") {
+        if (k === "ArrowLeft" || k === "ArrowRight" || k === "ArrowUp" || k === "ArrowDown") {
           e.preventDefault();
-          const direction = e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 1;
+          const direction = k === "ArrowLeft" || k === "ArrowUp" ? -1 : 1;
           setPendingChoiceIndex((current) => (current + direction + availableChoices.length) % availableChoices.length);
           return;
         }
-        if (e.key === "Enter") {
+        if (k === "Enter") {
           e.preventDefault();
           const choice = availableChoices[pendingChoiceIndex];
           if (choice) {
@@ -246,23 +258,23 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
       // moving back toward the board (or Backspace) returns to the grid.
       if (reserveCursor) {
         const list = reservesOf(state, reserveCursor.faction);
-        if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        if (k === "ArrowLeft" || k === "ArrowRight") {
           e.preventDefault();
           if (list.length > 0) {
-            const d = e.key === "ArrowLeft" ? -1 : 1;
+            const d = k === "ArrowLeft" ? -1 : 1;
             onReserveCursor?.({ ...reserveCursor, index: (reserveCursor.index + d + list.length) % list.length });
           }
           return;
         }
-        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+        if (k === "ArrowUp" || k === "ArrowDown") {
           e.preventDefault();
           const leaving =
-            (reserveCursor.faction === bottomFaction && e.key === "ArrowUp") ||
-            (reserveCursor.faction === topFaction && e.key === "ArrowDown");
+            (reserveCursor.faction === bottomFaction && k === "ArrowUp") ||
+            (reserveCursor.faction === topFaction && k === "ArrowDown");
           if (leaving) backToBoard();
           return;
         }
-        if (e.key === "Enter") {
+        if (k === "Enter") {
           e.preventDefault();
           if (reserveCursor.faction === state.turn) {
             const s = list[reserveCursor.index];
@@ -275,7 +287,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
           }
           return;
         }
-        if (e.key === "Backspace") {
+        if (k === "Backspace") {
           e.preventDefault();
           onDropSelect?.(null);
           backToBoard();
@@ -283,16 +295,16 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
         }
       }
 
-      if (arrows[e.key]) {
+      if (arrows[k]) {
         e.preventDefault();
         if (!cursor) {
           setCursor(selected ?? { q: 2, r: 2 });
           return;
         }
-        const next = step(cursor, arrows[e.key]);
+        const next = step(cursor, arrows[k]);
         if (next.q === cursor.q && next.r === cursor.r) {
           // At the top/bottom tip of the diamond: hand the focus to the tray.
-          const trayFaction = e.key === "ArrowDown" ? bottomFaction : e.key === "ArrowUp" ? topFaction : null;
+          const trayFaction = k === "ArrowDown" ? bottomFaction : k === "ArrowUp" ? topFaction : null;
           if (trayFaction && onReserveCursor && reservesOf(state, trayFaction).length > 0) {
             lastCellRef.current = cursor;
             setCursor(null);
@@ -303,13 +315,13 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
         setCursor(next);
         return;
       }
-      if (e.key === "Enter") {
+      if (k === "Enter") {
         e.preventDefault();
         if (cursor) clickRef.current(cursor);
         else setCursor(selected ?? { q: 2, r: 2 });
         return;
       }
-      if (e.key === "Backspace") {
+      if (k === "Backspace") {
         e.preventDefault();
         if (pending) setPending(null);
         else if (selected) onSelect(null);
