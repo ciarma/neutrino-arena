@@ -137,20 +137,23 @@ function DifficultyPicker({ onPick }: { onPick: (d: Difficulty) => void }) {
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      // Alternative mapping: W/A/S/D = arrows, E = Enter, R = Backspace, X = Esc
+      const aliases: Record<string, string> = { w: "ArrowUp", a: "ArrowLeft", s: "ArrowDown", d: "ArrowRight", e: "Enter", r: "Backspace", x: "Escape" };
+      const k = aliases[e.key.length === 1 ? e.key.toLowerCase() : e.key] ?? e.key;
+      if (k === "Escape") {
         navigate({ to: "/" });
         return;
       }
       const keys = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Enter", "Backspace"];
-      if (!keys.includes(e.key)) return;
+      if (!keys.includes(k)) return;
       e.preventDefault();
-      if (e.key === "Backspace") { setCursor(null); return; }
-      if (e.key === "Enter") {
+      if (k === "Backspace") { setCursor(null); return; }
+      if (k === "Enter") {
         if (cursor !== null) onPick(DIFFICULTIES[cursor]);
         else setCursor(0);
         return;
       }
-      const dir = e.key === "ArrowUp" || e.key === "ArrowLeft" ? -1 : 1;
+      const dir = k === "ArrowUp" || k === "ArrowLeft" ? -1 : 1;
       setCursor((c) => (c === null ? (dir === 1 ? 0 : DIFFICULTIES.length - 1) : (c + dir + DIFFICULTIES.length) % DIFFICULTIES.length));
     };
     window.addEventListener("keydown", onKeyDown);
