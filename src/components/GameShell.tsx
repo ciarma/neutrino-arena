@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import type { Faction, GameState } from "@/lib/game";
-import { piecesOf } from "@/lib/game";
 import { SoundToggle } from "@/components/SoundToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useI18n } from "@/lib/i18n";
@@ -14,13 +13,12 @@ type Props = {
   subtitle?: string;
   state: GameState;
   perspective?: Faction;
-  status?: ReactNode;
   children: ReactNode;
   actions?: ReactNode;
   splitKeys?: boolean;
 };
 
-export function GameShell({ title, subtitle, state, perspective, status, children, actions, splitKeys = false }: Props) {
+export function GameShell({ title, subtitle, state, perspective, children, actions, splitKeys = false }: Props) {
   const { t } = useI18n();
   const navigate = useNavigate();
 
@@ -37,10 +35,6 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [navigate, splitKeys, state.turn]);
-
-  const yellow = piecesOf(state, "yellow").length;
-  const purple = piecesOf(state, "purple").length;
-  const factionName = (f: Faction) => (f === "yellow" ? t("faction.yellow") : t("faction.purple"));
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -62,16 +56,8 @@ export function GameShell({ title, subtitle, state, perspective, status, childre
 
       <main className="mx-auto max-w-6xl px-4 py-6">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <FactionBadge faction="yellow" count={yellow} active={state.turn === "yellow" && !state.winner} perspective={perspective} />
-          <div className="text-center text-sm text-muted-foreground">
-            {status ??
-              (state.winner ? (
-                <span className="font-medium text-foreground">
-                  {t("shell.win", { faction: factionName(state.winner) })}
-                </span>
-              ) : null)}
-          </div>
-          <FactionBadge faction="purple" count={purple} active={state.turn === "purple" && !state.winner} perspective={perspective} />
+          <FactionBadge faction="yellow" active={state.turn === "yellow" && !state.winner} perspective={perspective} />
+          <FactionBadge faction="purple" active={state.turn === "purple" && !state.winner} perspective={perspective} />
         </div>
 
 
@@ -132,12 +118,10 @@ function MoveLog({ history, first = "yellow" }: { history: string[]; first?: Fac
 
 function FactionBadge({
   faction,
-  count,
   active,
   perspective,
 }: {
   faction: Faction;
-  count: number;
   active: boolean;
   perspective?: Faction;
 }) {
@@ -165,7 +149,6 @@ function FactionBadge({
         {faction === "yellow" ? t("faction.yellow") : t("faction.purple")}
         {isYou && <span className="ml-1 text-xs text-muted-foreground">{t("shell.you")}</span>}
       </span>
-      <span className="tabular-nums text-muted-foreground">{t("shell.pieces", { n: count })}</span>
     </div>
   );
 }

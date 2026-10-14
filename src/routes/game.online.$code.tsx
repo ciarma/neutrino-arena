@@ -205,16 +205,6 @@ function OnlineGame() {
   const bottomFaction: Faction = myFaction === "purple" ? "purple" : "yellow";
   const topFaction: Faction = bottomFaction === "yellow" ? "purple" : "yellow";
 
-  const waiting = row && !row.purple_player;
-  const status = waiting
-    ? t("online.waiting")
-    : !myFaction
-      ? t("online.full")
-      : state.winner
-        ? state.winner === myFaction ? t("online.won") : t("online.lost")
-        : state.turn === myFaction
-          ? t("online.yourTurn")
-          : t("online.waitOpponent");
 
   return (
     <GameShell
@@ -222,7 +212,6 @@ function OnlineGame() {
       subtitle={myFaction ? t("online.youAre", { faction: myFaction === "yellow" ? t("faction.yellowShort") : t("faction.purpleShort") }) : t("online.spectator")}
       state={state}
       perspective={myFaction ?? "yellow"}
-      status={status}
       actions={
         <div className="flex items-center gap-3">
 	<PdfViewerModal />
