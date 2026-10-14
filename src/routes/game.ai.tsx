@@ -89,7 +89,7 @@ function AiGame() {
 
 
   return (
-    <GameShell title={t("ai.title")} subtitle={t("ai.subtitle", { difficulty: difficulty === "easy" ? t("ai.easy") : t("ai.hard") })} state={state} perspective={player} status={status}
+    <GameShell title={t("ai.title")} subtitle={t("ai.subtitle", { difficulty: difficulty === "easy" ? t("ai.easy") : t("ai.hard") })} state={state} perspective={player}
       actions={
 	<div className="flex items-center gap-3">
 	<PdfViewerModal />
