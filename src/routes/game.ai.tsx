@@ -87,11 +87,6 @@ function AiGame() {
     }
   };
 
-  const status = state.winner
-    ? state.winner === player ? t("ai.won") : t("ai.lost")
-    : thinking
-      ? t("ai.thinking")
-      : t("ai.yourTurn");
 
   return (
     <GameShell title={t("ai.title")} subtitle={t("ai.subtitle", { difficulty: difficulty === "easy" ? t("ai.easy") : t("ai.hard") })} state={state} perspective={player} status={status}
