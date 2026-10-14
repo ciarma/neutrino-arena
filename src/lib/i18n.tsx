@@ -60,7 +60,7 @@ const it = {
   "footer.project": "INFN GAME",
   "footer.author": "Andrea Ciarma",
   "footer.version": "v0.1.0",
-  "footer.placeholder": "Qui potrai inserire logo INFN, autore e versione",
+  "footer.placeholder": "",
 
   "local.title": "Partita locale",
   "local.subtitle": "Due giocatori, stesso dispositivo",
@@ -154,7 +154,7 @@ const en: Dict = {
   "footer.project": "INFN GAME",
   "footer.author": "Andrea Ciarma",
   "footer.version": "v0.1.0",
-  "footer.placeholder": "Here you can add the INFN logo, author and version",
+  "footer.placeholder": "",
 
   "local.title": "Local game",
   "local.subtitle": "Two players, same device",
