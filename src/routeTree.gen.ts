@@ -9,27 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as GameAiRouteImport } from './routes/game.ai'
-import { Route as GameLocalRouteImport } from './routes/game.local'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as GameTutorialRouteImport } from './routes/game.tutorial'
+import { Route as GameLocalRouteImport } from './routes/game.local'
+import { Route as GameAiRouteImport } from './routes/game.ai'
 import { Route as GameOnlineIndexRouteImport } from './routes/game.online.index'
 import { Route as GameOnlineCodeRouteImport } from './routes/game.online.$code'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GameAiRoute = GameAiRouteImport.update({
-  id: '/game/ai',
-  path: '/game/ai',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GameTutorialRoute = GameTutorialRouteImport.update({
+  id: '/game/tutorial',
+  path: '/game/tutorial',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GameLocalRoute = GameLocalRouteImport.update({
@@ -37,9 +37,9 @@ const GameLocalRoute = GameLocalRouteImport.update({
   path: '/game/local',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GameTutorialRoute = GameTutorialRouteImport.update({
-  id: '/game/tutorial',
-  path: '/game/tutorial',
+const GameAiRoute = GameAiRouteImport.update({
+  id: '/game/ai',
+  path: '/game/ai',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GameOnlineIndexRoute = GameOnlineIndexRouteImport.update({
@@ -123,13 +123,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -137,11 +130,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/game/ai': {
-      id: '/game/ai'
-      path: '/game/ai'
-      fullPath: '/game/ai'
-      preLoaderRoute: typeof GameAiRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/game/tutorial': {
+      id: '/game/tutorial'
+      path: '/game/tutorial'
+      fullPath: '/game/tutorial'
+      preLoaderRoute: typeof GameTutorialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/game/local': {
@@ -151,11 +151,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GameLocalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/game/tutorial': {
-      id: '/game/tutorial'
-      path: '/game/tutorial'
-      fullPath: '/game/tutorial'
-      preLoaderRoute: typeof GameTutorialRouteImport
+    '/game/ai': {
+      id: '/game/ai'
+      path: '/game/ai'
+      fullPath: '/game/ai'
+      preLoaderRoute: typeof GameAiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/game/online/': {
