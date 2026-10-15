@@ -38,6 +38,8 @@ type Props = {
   onDropSelect?: (s: PieceState | null) => void;
   /** Local mode: WASD/E/R/X only for yellow, IJKL/O/P/N only for purple. */
   splitKeys?: boolean;
+  /** Tutorial: restrict selection and targets to a single guided move. */
+  guidedMove?: { from: Axial; to: Axial } | null;
 };
 
 
@@ -76,7 +78,7 @@ function SlideIn({ dx, dy, duration, children }: { dx: number; dy: number; durat
 
 
 
-export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled, dropState = null, onDrop, reserveCursor = null, onReserveCursor, onDropSelect, splitKeys = false }: Props) {
+export function HexBoard({ state, selected, onSelect, onMove, perspective = "yellow", disabled, dropState = null, onDrop, reserveCursor = null, onReserveCursor, onDropSelect, splitKeys = false, guidedMove }: Props) {
   const { t } = useI18n();
   const bounds = useMemo(() => boardPixelBounds(HEX_SIZE), []);
 
@@ -87,8 +89,8 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
   }, [state, dropState]);
   const targets = useMemo(() => {
     if (!selected) return new Set<string>();
-    return new Set(legalMoves(state, selected).map(key));
-  }, [state, selected]);
+    return new Set(legalMoves(state, selected).filter((to) => guidedMove === undefined || (guidedMove && key(selected) === key(guidedMove.from) && key(to) === key(guidedMove.to))).map(key));
+  }, [state, selected, guidedMove]);
   const targetStates = useMemo(() => {
     const result = new Map<string, PieceState[]>();
     if (!selected) return result;
@@ -157,6 +159,7 @@ export function HexBoard({ state, selected, onSelect, onMove, perspective = "yel
     if (disabled) return;
     const k = key(cell);
     const piece = state.pieces[k];
+    if (guidedMove !== undefined && (!guidedMove || (k !== key(guidedMove.from) && !(selected && key(selected) === key(guidedMove.from) && k === key(guidedMove.to))))) return;
 
     if (dropState) {
       if (dropTargets.has(k)) onDrop?.(cell);
