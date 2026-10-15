@@ -64,6 +64,9 @@ const it = {
 
   "local.title": "Partita locale",
   "local.subtitle": "Due giocatori, stesso dispositivo",
+  "tutorial.title": "Tutorial",
+  "tutorial.subtitle": "Impara a giocare passo dopo passo",
+  "tutorial.placeholder": "Il tutorial è in preparazione: presto qui troverai una guida interattiva alle regole.",
   "ai.title": "Contro l'IA",
   "ai.chooseDifficulty": "Scegli la difficoltà prima di iniziare.",
   "ai.easy": "Facile",
@@ -158,6 +161,9 @@ const en: Dict = {
 
   "local.title": "Local game",
   "local.subtitle": "Two players, same device",
+  "tutorial.title": "Tutorial",
+  "tutorial.subtitle": "Learn to play step by step",
+  "tutorial.placeholder": "The tutorial is coming soon: an interactive guide to the rules will appear here.",
   "ai.title": "Vs AI",
   "ai.chooseDifficulty": "Choose the difficulty before starting.",
   "ai.easy": "Easy",
