@@ -211,6 +211,7 @@ function TutorialGame() {
         </AlertDialogContent>
       </AlertDialog>
       <div className="space-y-3">
+        <ReserveTray state={state} faction="purple" />
         <HexBoard
           state={state}
           selected={selected}
