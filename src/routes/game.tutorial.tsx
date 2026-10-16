@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { applyMove, type GameState } from "@/lib/game";
+import { applyMove, applyDrop, isInCheck, type GameState } from "@/lib/game";
 import { key, type Axial } from "@/lib/hex";
 import { useI18n, type TKey } from "@/lib/i18n";
 import { playMoveSound } from "@/lib/sound";
@@ -79,18 +79,45 @@ const catturaState: GameState = {
   },
 };
 
+const check1State: GameState = {
+  ...emptyState,
+  pieces: {
+    "0,3": { id: "tut-e", owner: "yellow", pos: { q: 0, r: 3 }, state: "E", kind: "pawn" }, 
+    "3,1": { id: "tut-e", owner: "purple", pos: { q: 3, r: 1 }, state: "M", kind: "king" }, 
+  },
+};
+
+const king1State: GameState = {
+  ...emptyState,
+  pieces: {
+    "1,3": { id: "tut-e", owner: "yellow", pos: { q: 1, r: 3 }, state: "E", kind: "king" }, 
+    "3,1": { id: "tut-e", owner: "purple", pos: { q: 3, r: 1 }, state: "E", kind: "king" }, 
+  },
+};
+
+const king2State: GameState = {
+  ...emptyState,
+  pieces: {
+    "1,3": { id: "tut-e", owner: "yellow", pos: { q: 1, r: 3 }, state: "E", kind: "pawn" }, 
+    "3,3": { id: "tut-e", owner: "purple", pos: { q: 3, r: 3 }, state: "E", kind: "king" }, 
+  },
+};
+
 // The tutorial is a single timeline. Add dialogs, moves, and optional board resets here.
 // A "setup" replaces the board; omitting it preserves the current positions.
 type TutorialStep =
   | { type: "dialog"; title: TKey; body: TKey }
   | { type: "setup"; state: GameState }
   | { type: "move"; from: Axial; to: Axial }
-  | { type: "freeMove" };
+  | { type: "freeMove" }
+  | { type: "drop"; pieceState: "E" | "M" | "T" }
+  | { type: "freeCheck" }
+  | { type: "end" };
 
 const tutorialSteps: TutorialStep[] = [
   // Welcome: the board is still empty.
   { type: "dialog", title: "tutorial.welcomeTitle", body: "tutorial.welcomeBody" },
-
+/*
   // Preserve the original behavior: the three pawns appear after Welcome.
   { type: "setup", state: step1State },
   { type: "dialog", title: "tutorial.flavoursTitle", body: "tutorial.flavoursBody" },
@@ -123,6 +150,27 @@ const tutorialSteps: TutorialStep[] = [
   { type: "setup", state: catturaState },
   { type: "move", from: { q: 1, r: 3 }, to: { q: 3, r: 1 } },
 
+  { type: "dialog", title: "tutorial.deploy1Title", body: "tutorial.deploy1Body" },
+  { type: "drop", pieceState: "M" },
+
+
+  { type: "dialog", title: "tutorial.check1Title", body: "tutorial.check1Body" },
+  { type: "setup", state: check1State },
+  { type: "freeCheck"},
+  { type: "dialog", title: "tutorial.check2Title", body: "tutorial.check2Body" },
+
+
+  { type: "dialog", title: "tutorial.kings1Title", body: "tutorial.kings1Body" },
+  { type: "dialog", title: "tutorial.kings2Title", body: "tutorial.kings2Body" },
+  { type: "setup", state: king1State },
+  { type: "freeMove"},
+*/
+  { type: "dialog", title: "tutorial.check3Title", body: "tutorial.check3Body" },
+  { type: "setup", state: king2State },
+  { type: "freeCheck"},
+  { type: "dialog", title: "tutorial.endTitle", body: "tutorial.endBody" },
+  //{ type: "end"},
+
   // Extend the tutorial here, for example:
   // { type: "dialog", title: "tutorial.nextTitle", body: "tutorial.nextBody" },
   // { type: "move", from: { q: 2, r: 3 }, to: { q: 3, r: 3 } }, // keep current board
@@ -142,9 +190,11 @@ function TutorialGame() {
   const { t } = useI18n();
   const [selected, setSelected] = useState<Axial | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
+  const [checkFeedback, setCheckFeedback] = useState<"correct" | "wrong" | null>(null);
   const [practiceState, setPracticeState] = useState<GameState>(emptyState);
   const currentStep = tutorialSteps[stepIndex];
   const message = currentStep?.type === "dialog" ? currentStep : null;
+  const isFinished = currentStep?.type === "end";
   const guidedMove = currentStep?.type === "move"  ? { from: currentStep.from, to: currentStep.to }  : null;
   const state = practiceState;
 
@@ -161,13 +211,17 @@ function TutorialGame() {
     setStepIndex(index);
   };
 
-  const onMove = (from: Axial,to: Axial,chosen?: "M" | "T") => {
+  const onMove = (
+    from: Axial,
+    to: Axial,
+    chosen?: "M" | "T"
+  ) => {
     if (
       currentStep?.type !== "move" &&
-      currentStep?.type !== "freeMove"
+      currentStep?.type !== "freeMove" &&
+      currentStep?.type !== "freeCheck"
     ) return;
 
-    // Controlla le coordinate solo per le mosse guidate
     if (
       currentStep.type === "move" &&
       (
@@ -177,6 +231,37 @@ function TutorialGame() {
     ) return;
 
     const next = applyMove(practiceState, from, to, chosen);
+    if (!next) return;
+
+    // Nell'esercizio scacco, valuta prima di modificare la scacchiera.
+    if (currentStep.type === "freeCheck") {
+      setSelected(null);
+      if (!isInCheck(next, "purple")) {
+        setCheckFeedback("wrong");
+        return;
+      }
+      setPracticeState({ ...next, turn: "yellow", first: "yellow" });
+      playMoveSound();
+      setCheckFeedback("correct");
+      return;
+    }
+
+    setPracticeState({ ...next, turn: "yellow", first: "yellow" });
+    setSelected(null);
+    playMoveSound();
+    advanceTo(stepIndex + 1);
+  };
+
+  const onDrop = (to: Axial) => {
+    if (currentStep?.type !== "drop") return;
+
+    const next = applyDrop(
+      practiceState,
+      practiceState.turn,
+      currentStep.pieceState,
+      to
+    );
+
     if (!next) return;
 
     setPracticeState({
@@ -210,13 +295,37 @@ function TutorialGame() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <AlertDialog open={checkFeedback !== null}>
+        <AlertDialogContent onKeyDown={(event) => event.stopPropagation()}>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {checkFeedback === "correct" ? t("tutorial.checkCorrectTitle") : t("tutorial.checkWrongTitle")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {checkFeedback === "correct"
+                ? t("tutorial.checkCorrectBody")
+                : t("tutorial.checkWrongBody")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={(event) => {
+              event.preventDefault();
+              const wasCorrect = checkFeedback === "correct";
+              setCheckFeedback(null);
+              if (wasCorrect) advanceTo(stepIndex + 1);
+            }}>
+              {checkFeedback === "correct" ? t("tutorial.continue") : t("tutorial.checkRetry")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <div className="space-y-3">
         <ReserveTray state={state} faction="purple" />
         <HexBoard
           state={state}
           selected={selected}
           onSelect={(cell) => {
-            if (currentStep?.type === "freeMove") {
+            if (currentStep?.type === "freeMove" || currentStep?.type === "freeCheck") {
               setSelected(cell);
             } else if (
               !cell ||
@@ -229,12 +338,25 @@ function TutorialGame() {
             }
           }}
           onMove={onMove}
-          {...(currentStep?.type === "freeMove"
+          dropState={
+            currentStep?.type === "drop"
+              ? currentStep.pieceState
+              : null
+          }
+          onDrop={onDrop}
+          {...(
+            currentStep?.type === "freeMove" ||
+            currentStep?.type === "freeCheck" ||
+            currentStep?.type === "drop"
             ? {}
             : { guidedMove: guidedMove ?? null })}
           disabled={
+            checkFeedback !== null || (
             currentStep?.type !== "move" &&
-            currentStep?.type !== "freeMove"
+            currentStep?.type !== "freeMove" &&
+            currentStep?.type !== "freeCheck" &&
+            currentStep?.type !== "drop"
+            )
           }
         />
         <ReserveTray state={state} faction="yellow" />
