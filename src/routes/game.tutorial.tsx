@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { GameShell } from "@/components/GameShell";
 import { HexBoard } from "@/components/HexBoard";
+import { ReserveTray } from "@/components/ReserveTray";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -210,6 +211,7 @@ function TutorialGame() {
         </AlertDialogContent>
       </AlertDialog>
       <div className="space-y-3">
+        <ReserveTray state={state} faction="purple" />
         <HexBoard
           state={state}
           selected={selected}
@@ -235,6 +237,7 @@ function TutorialGame() {
             currentStep?.type !== "freeMove"
           }
         />
+        <ReserveTray state={state} faction="yellow" />
       </div>
     </GameShell>
   );
