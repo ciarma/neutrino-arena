@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { GameShell } from "@/components/GameShell";
 import { HexBoard } from "@/components/HexBoard";
+import { ReserveTray } from "@/components/ReserveTray";
 import {
   AlertDialog,
   AlertDialogAction,
