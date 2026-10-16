@@ -56,18 +56,77 @@ const step1State: GameState = {
   },
 };
 
-const messages: { title: TKey; body: TKey }[] = [
-  { title: "tutorial.welcomeTitle", body: "tutorial.welcomeBody" },
-  { title: "tutorial.flavoursTitle", body: "tutorial.flavoursBody" },
-  { title: "tutorial.oscillationTitle", body: "tutorial.oscillationBody" },
-  { title: "tutorial.piecesTitle", body: "tutorial.piecesBody" },
-  { title: "tutorial.oneStepTitle", body: "tutorial.oneStepBody" },
-];
+const freeState: GameState = {
+  ...emptyState,
+  pieces: {
+    "2,2": { id: "tut-e", owner: "yellow", pos: { q: 2, r: 2 }, state: "E", kind: "pawn" }, 
+  },
+};
 
-const guidedMoves = [
-  { from: { q: 1, r: 3 }, to: { q: 2, r: 3 } },
-  { from: { q: 2, r: 2 }, to: { q: 3, r: 2 } },
-  { from: { q: 3, r: 1 }, to: { q: 4, r: 1 } },
+const schierState: GameState = {
+  ...emptyState,
+  pieces: {
+    "0,1": { id: "tut-e", owner: "yellow", pos: { q: 0, r: 1 }, state: "E", kind: "pawn" }, 
+  },
+};
+
+const catturaState: GameState = {
+  ...emptyState,
+  pieces: {
+    "1,3": { id: "tut-e", owner: "yellow", pos: { q: 1, r: 3 }, state: "E", kind: "pawn" }, 
+    "3,1": { id: "tut-e", owner: "purple", pos: { q: 3, r: 1 }, state: "M", kind: "pawn" }, 
+  },
+};
+
+// The tutorial is a single timeline. Add dialogs, moves, and optional board resets here.
+// A "setup" replaces the board; omitting it preserves the current positions.
+type TutorialStep =
+  | { type: "dialog"; title: TKey; body: TKey }
+  | { type: "setup"; state: GameState }
+  | { type: "move"; from: Axial; to: Axial }
+  | { type: "freeMove" };
+
+const tutorialSteps: TutorialStep[] = [
+  // Welcome: the board is still empty.
+  { type: "dialog", title: "tutorial.welcomeTitle", body: "tutorial.welcomeBody" },
+
+  // Preserve the original behavior: the three pawns appear after Welcome.
+  { type: "setup", state: step1State },
+  { type: "dialog", title: "tutorial.flavoursTitle", body: "tutorial.flavoursBody" },
+  { type: "dialog", title: "tutorial.oscillationTitle", body: "tutorial.oscillationBody" },
+  { type: "dialog", title: "tutorial.piecesTitle", body: "tutorial.piecesBody" },
+  { type: "dialog", title: "tutorial.oneStepTitle", body: "tutorial.oneStepBody" },
+
+  // First exercise: three guided moves, with no dialogs between them.
+  { type: "move", from: { q: 1, r: 3 }, to: { q: 2, r: 3 } },
+  { type: "move", from: { q: 2, r: 2 }, to: { q: 3, r: 2 } },
+  { type: "move", from: { q: 3, r: 1 }, to: { q: 4, r: 1 } },
+
+  { type: "dialog", title: "tutorial.twoStepTitle", body: "tutorial.twoStepBody" },
+  { type: "move", from: { q: 2, r: 3 }, to: { q: 0, r: 3 } },
+  { type: "move", from: { q: 3, r: 2 }, to: { q: 1, r: 2 } },
+  { type: "move", from: { q: 4, r: 1 }, to: { q: 2, r: 1 } },
+
+  { type: "dialog", title: "tutorial.freeStepTitle", body: "tutorial.freeStepBody" },
+
+  { type: "dialog", title: "tutorial.schier1Title", body: "tutorial.schier1Body" },
+  { type: "dialog", title: "tutorial.schier2Title", body: "tutorial.schier2Body" },
+  { type: "setup", state: schierState },
+  { type: "freeMove"},
+
+  { type: "dialog", title: "tutorial.schier3Title", body: "tutorial.schier3Body" },
+  { type: "setup", state: freeState },
+  { type: "freeMove"},
+
+  { type: "dialog", title: "tutorial.catturaTitle", body: "tutorial.catturaBody" },
+  { type: "setup", state: catturaState },
+  { type: "move", from: { q: 1, r: 3 }, to: { q: 3, r: 1 } },
+
+  // Extend the tutorial here, for example:
+  // { type: "dialog", title: "tutorial.nextTitle", body: "tutorial.nextBody" },
+  // { type: "move", from: { q: 2, r: 3 }, to: { q: 3, r: 3 } }, // keep current board
+  // { type: "setup", state: anotherState },                 // or replace the board
+  // { type: "move", from: { q: 0, r: 0 }, to: { q: 1, r: 0 } },
 ];
 
 const illustrations: Record<string, { src: string; alt: string; wide?: boolean }> = {
@@ -81,20 +140,52 @@ const illustrations: Record<string, { src: string; alt: string; wide?: boolean }
 function TutorialGame() {
   const { t } = useI18n();
   const [selected, setSelected] = useState<Axial | null>(null);
-  const [messageIndex, setMessageIndex] = useState(0);
-  const [practiceState, setPracticeState] = useState(step1State);
-  const [moveIndex, setMoveIndex] = useState(0);
-  const message = messages[messageIndex];
-  const state = messageIndex === 0 ? emptyState : practiceState;
-  const guidedMove = guidedMoves[moveIndex] ?? null;
+  const [stepIndex, setStepIndex] = useState(0);
+  const [practiceState, setPracticeState] = useState<GameState>(emptyState);
+  const currentStep = tutorialSteps[stepIndex];
+  const message = currentStep?.type === "dialog" ? currentStep : null;
+  const guidedMove = currentStep?.type === "move"  ? { from: currentStep.from, to: currentStep.to }  : null;
+  const state = practiceState;
 
-  const onMove = (from: Axial, to: Axial) => {
-    if (message || !guidedMove || key(from) !== key(guidedMove.from) || key(to) !== key(guidedMove.to)) return;
-    const next = applyMove(practiceState, from, to);
+  // Advance through the timeline. Setup steps run immediately and do not
+  // require a click; dialogs and moves pause until the user completes them.
+  const advanceTo = (nextIndex: number) => {
+    let index = nextIndex;
+    while (tutorialSteps[index]?.type === "setup") {
+      const setup = tutorialSteps[index];
+      if (setup.type === "setup") setPracticeState(setup.state);
+      setSelected(null);
+      index += 1;
+    }
+    setStepIndex(index);
+  };
+
+  const onMove = (from: Axial,to: Axial,chosen?: "M" | "T") => {
+    if (
+      currentStep?.type !== "move" &&
+      currentStep?.type !== "freeMove"
+    ) return;
+
+    // Controlla le coordinate solo per le mosse guidate
+    if (
+      currentStep.type === "move" &&
+      (
+        key(from) !== key(currentStep.from) ||
+        key(to) !== key(currentStep.to)
+      )
+    ) return;
+
+    const next = applyMove(practiceState, from, to, chosen);
     if (!next) return;
-    setPracticeState({ ...next, turn: "yellow", first: "yellow" });
+
+    setPracticeState({
+      ...next,
+      turn: "yellow",
+      first: "yellow",
+    });
+
     setSelected(null);
-    setMoveIndex((current) => current + 1);
+    advanceTo(stepIndex + 1);
     playMoveSound();
   };
 
@@ -112,7 +203,7 @@ function TutorialGame() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={(event) => { event.preventDefault(); setMessageIndex((current) => current + 1); }}>
+            <AlertDialogAction onClick={(event) => { event.preventDefault(); advanceTo(stepIndex + 1); }}>
               {t("tutorial.continue")}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -123,11 +214,26 @@ function TutorialGame() {
           state={state}
           selected={selected}
           onSelect={(cell) => {
-            if (!cell || (guidedMove && key(cell) === key(guidedMove.from))) setSelected(cell);
+            if (currentStep?.type === "freeMove") {
+              setSelected(cell);
+            } else if (
+              !cell ||
+              (
+                guidedMove &&
+                key(cell) === key(guidedMove.from)
+              )
+            ) {
+              setSelected(cell);
+            }
           }}
           onMove={onMove}
-          guidedMove={guidedMove}
-          disabled={Boolean(message) || !guidedMove}
+          {...(currentStep?.type === "freeMove"
+            ? {}
+            : { guidedMove: guidedMove ?? null })}
+          disabled={
+            currentStep?.type !== "move" &&
+            currentStep?.type !== "freeMove"
+          }
         />
       </div>
     </GameShell>

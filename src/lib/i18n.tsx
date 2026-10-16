@@ -67,6 +67,7 @@ const it = {
   "tutorial.title": "Tutorial",
   "tutorial.subtitle": "Impara a giocare passo dopo passo",
   "tutorial.placeholder": "Il tutorial è in preparazione: presto qui troverai una guida interattiva alle regole.",
+
   "tutorial.welcomeTitle": "Benvenuto al tutorial!",
   "tutorial.welcomeBody": "Qui imparerai passo dopo passo le regole di Neutrino Arena. Premi Continua per iniziare.",
   "tutorial.continue": "Continua",
@@ -78,6 +79,20 @@ const it = {
   "tutorial.piecesBody": "Anche le nostre Pedine possono cambiare di Sapore quando si muovono sul tabellone!",
   "tutorial.oneStepTitle": "Un solo passo",
   "tutorial.oneStepBody": "Se ci muoviamo di un solo passo, il neutrino elettronico rimane tale {ee}, il neutrino muonico diventa tauonico e viceversa {mt}. Prova a muovere le pedine di 1 passo!",
+  "tutorial.twoStepTitle": "Due passi",
+  "tutorial.twoStepBody": "Ottimo! Se invece ci muoviamo di due passi, il neutrino elettronico può diventare muonico o tauonico, mentre i neutrini muonici e tauonici diventano elettronici. Prova a muovere le pedine di 2 passi!",
+  "tutorial.freeStepTitle": "Movimento Libero",
+  "tutorial.freeStepBody": "Perfetto! Le pedine possono muoversi solo di 1 o 2 celle. Cliccando sulla pedina che vuoi muovere dei simboli ti mostreranno quali sono le mosse valide e con che sapore terminerai il movimento.",
+  "tutorial.schier1Title": "Le zone di schieramento",
+  "tutorial.schier1Body": "Alcune celle sul tabellone sono colorate di Giallo o di Viola. Queste sono dette Zone di Schieramento, e sono le celle in cui si trovano le pedine a inizio partita. Le celle bianche al centro invece formano il Campo di Battaglia",
+  "tutorial.schier2Title": "Le zone di schieramento",
+  "tutorial.schier2Body": "Una pedina in una Zona di Schieramento può muoversi soltanto in avanti verso il Campo di Battaglia", 
+  "tutorial.schier3Title": "Le zone di schieramento",
+  "tutorial.schier3Body": "Invece una pedina nel Campo di Battaglia può muoversi in qualsiasi direzione ma mai rientrare in una Zona di Schieramento.",
+  "tutorial.catturaTitle": "Catturare una pedina avversaria",
+  "tutorial.catturaBody": "Per catturare una pedina avversaria finisci il tuo movimento su di essa con il suo stesso sapore.",
+
+
   "ai.title": "Contro l'IA",
   "ai.chooseDifficulty": "Scegli la difficoltà prima di iniziare.",
   "ai.easy": "Facile",
