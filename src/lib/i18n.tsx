@@ -252,7 +252,7 @@ const en: Dict = {
   "tutorial.checkCorrectBody": "You've put the opponent's King in check.",
   "tutorial.checkWrongBody": "This move doesn't put the King in check. Try again!",
   "tutorial.checkRetry": "Try Again",
-  "tutorial.backToMenu": "Back to Home"
+  "tutorial.backToMenu": "Back to Home",
   
   "ai.title": "Vs AI",
   "ai.chooseDifficulty": "Choose the difficulty before starting.",
