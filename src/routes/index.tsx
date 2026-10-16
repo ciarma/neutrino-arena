@@ -138,6 +138,12 @@ function Home() {
             <h2 className="font-serif text-2xl">{t("home.howTo")}</h2>
             {lang === "it" ? <RulesIt /> : <RulesEn />}
             <div className="mt-6 flex flex-wrap items-center gap-4">
+              <Link
+                to="/game/tutorial"
+                className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+              >
+                {t("home.playTutorial")}
+              </Link>
               <PdfViewerModal />
               <a
                 href={getRulesPdfPath(lang)}
