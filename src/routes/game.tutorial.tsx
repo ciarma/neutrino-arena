@@ -117,7 +117,7 @@ type TutorialStep =
 const tutorialSteps: TutorialStep[] = [
   // Welcome: the board is still empty.
   { type: "dialog", title: "tutorial.welcomeTitle", body: "tutorial.welcomeBody" },
-/*
+
   // Preserve the original behavior: the three pawns appear after Welcome.
   { type: "setup", state: step1State },
   { type: "dialog", title: "tutorial.flavoursTitle", body: "tutorial.flavoursBody" },
@@ -164,7 +164,7 @@ const tutorialSteps: TutorialStep[] = [
   { type: "dialog", title: "tutorial.kings2Title", body: "tutorial.kings2Body" },
   { type: "setup", state: king1State },
   { type: "freeMove"},
-*/
+
   { type: "dialog", title: "tutorial.check3Title", body: "tutorial.check3Body" },
   { type: "setup", state: king2State },
   { type: "freeCheck"},
