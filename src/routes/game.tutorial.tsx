@@ -237,6 +237,7 @@ function TutorialGame() {
             currentStep?.type !== "freeMove"
           }
         />
+        <ReserveTray state={state} faction="yellow" />
       </div>
     </GameShell>
   );
